@@ -1,0 +1,2191 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SenseCellar Web Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a workbench. A lesson rail on the left, one lesson or tool at a time on the right.
+   Colour encodes the three places everywhere: blue = your Mac, violet = GitHub, teal = the live web host. */
+:root{
+  --bg:#F5F4F7; --surface:#FFFFFF; --surface-2:#EEECF2; --ink:#1C1922; --muted:#5F5867; --line:#DCD7E2;
+  --accent:#8A1C3F; --accent-ink:#FFFFFF; --accent-soft:#F5E3EA;
+  --mac:#2B5DA6; --mac-soft:#E2EBF8;
+  --gh:#5A4691; --gh-soft:#ECE7F7;
+  --live:#0D7064; --live-soft:#DAF0EC;
+  --ok:#2D7A33; --ok-soft:#E1F1E2; --warn:#955700; --warn-soft:#FAEDD6; --bad:#B02418; --bad-soft:#FBE4E1;
+  --code-bg:#1E1A24; --code-ink:#ECE7F1; --code-muted:#9B92A6; --code-line:#332D3B; --t-ok:#8FE0A0; --t-err:#FF9D90; --t-key:#F2C27A;
+  --f-display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#131118; --surface:#1B1821; --surface-2:#25212C; --ink:#ECE8F1; --muted:#A69EB0; --line:#353040;
+    --accent:#EB8CA9; --accent-ink:#2A0A16; --accent-soft:#3B1B28;
+    --mac:#88B0EC; --mac-soft:#1A2940;
+    --gh:#B5A5EA; --gh-soft:#29233F;
+    --live:#5DCDBB; --live-soft:#132F2B;
+    --ok:#80CF84; --ok-soft:#1B2E1C; --warn:#EDB862; --warn-soft:#33270F; --bad:#F48A7F; --bad-soft:#3B1A17;
+    --code-bg:#0E0C12; --code-ink:#ECE7F1; --code-muted:#8E8599; --code-line:#2A2531; --t-ok:#8FE0A0; --t-err:#FF9D90; --t-key:#F2C27A;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131118; --surface:#1B1821; --surface-2:#25212C; --ink:#ECE8F1; --muted:#A69EB0; --line:#353040;
+  --accent:#EB8CA9; --accent-ink:#2A0A16; --accent-soft:#3B1B28;
+  --mac:#88B0EC; --mac-soft:#1A2940;
+  --gh:#B5A5EA; --gh-soft:#29233F;
+  --live:#5DCDBB; --live-soft:#132F2B;
+  --ok:#80CF84; --ok-soft:#1B2E1C; --warn:#EDB862; --warn-soft:#33270F; --bad:#F48A7F; --bad-soft:#3B1A17;
+  --code-bg:#0E0C12; --code-ink:#ECE7F1; --code-muted:#8E8599; --code-line:#2A2531; --t-ok:#8FE0A0; --t-err:#FF9D90; --t-key:#F2C27A;
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16.5px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:268px minmax(0,1fr);gap:44px;max-width:1240px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.rail{position:sticky;top:env(safe-area-inset-top,0px);align-self:start;max-height:100vh;overflow:auto;padding-block:28px 32px}
+main{min-width:0;padding-block:40px 96px}
+.view{max-width:880px}
+.brand-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;flex-direction:column;text-decoration:none;color:var(--ink);line-height:1}
+.brand-small{font:600 11px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.brand-big{font:800 30px/1 var(--f-display);letter-spacing:-.03em;margin-top:6px}
+.btn.rail-toggle{display:none}
+.progress{margin:22px 0 4px;display:grid;gap:7px;font-size:13px;color:var(--muted)}
+.bar{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--ok);border-radius:99px;transition:width .4s ease}
+.nav h2{font:600 11px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:26px 0 8px 10px}
+.nav a{display:flex;gap:11px;align-items:center;padding:7px 10px;border-radius:9px;color:var(--ink);text-decoration:none;font-size:15px;line-height:1.3}
+.nav a:hover{background:var(--surface-2)}
+.nav a.current{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);font-weight:700}
+.nav .num{width:23px;height:23px;border-radius:50%;display:grid;place-items:center;font:600 11px/1 var(--f-mono);border:1.5px solid var(--line);color:var(--muted);flex:none}
+.nav a.done .num{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.nav .ico{width:23px;height:23px;display:grid;place-items:center;color:var(--muted);flex:none}
+.ico svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rail-foot{margin:26px 10px 0;font-size:12.5px;color:var(--muted);line-height:1.5}
+
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr);gap:0}
+  .rail{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);max-height:none;overflow:visible;
+    padding-block:10px;border-bottom:1px solid var(--line);
+    margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .brand{flex-direction:row;align-items:baseline;gap:8px}
+  .brand-big{font-size:22px;margin:0}
+  .btn.rail-toggle{display:inline-flex}
+  .rail-nav{display:none;max-height:calc(100vh - 80px);overflow:auto;padding-bottom:10px}
+  .rail.open .rail-nav{display:block}
+  main{padding-block:26px 80px}
+}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0;font-optical-sizing:auto}
+h1{font-size:clamp(31px,4.4vw,46px);font-weight:760;letter-spacing:-.025em}
+h2{font-size:26px;font-weight:720;letter-spacing:-.015em;margin:52px 0 12px}
+h3{font-size:19px;font-weight:700;margin:30px 0 8px}
+h4{font-size:16px;font-weight:700}
+p{margin:0 0 14px;max-width:68ch}
+ul,ol{padding-left:22px;margin:0 0 16px}
+li{margin:4px 0;max-width:66ch}
+a{color:var(--accent);text-underline-offset:2px}
+strong,b{font-weight:700}
+.eyebrow{font:600 12px/1.3 var(--f-mono);letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:0 0 14px}
+.lede{font-size:19.5px;line-height:1.5;color:var(--muted);margin-top:16px;max-width:58ch}
+code,kbd,.mono{font-family:var(--f-mono);font-size:.86em}
+:not(pre)>code{background:var(--surface-2);padding:1px 6px;border-radius:5px;border:1px solid var(--line);overflow-wrap:anywhere}
+kbd{display:inline-block;padding:1px 7px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--surface);font-size:.8em}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+
+/* ---------- callouts ---------- */
+.key,.note,.caution{border-radius:var(--r);padding:16px 18px;margin:24px 0}
+.key{background:var(--accent-soft)}
+.note{background:var(--surface-2)}
+.caution{background:var(--warn-soft)}
+.label{display:block;font:600 11px/1.2 var(--f-mono);letter-spacing:.13em;text-transform:uppercase;margin-bottom:7px}
+.key .label{color:var(--accent)} .note .label{color:var(--muted)} .caution .label{color:var(--warn)}
+.key p:last-child,.note p:last-child,.caution p:last-child,.key ul:last-child,.caution ul:last-child{margin-bottom:0}
+.key p,.note p,.caution p{max-width:none}
+
+/* ---------- labs (interactive panels) ---------- */
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin:24px 0 30px;overflow:hidden}
+.lab-head{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.lab-head .label{color:var(--accent);margin:0}
+.lab-head h3{margin:0;font-size:17.5px;flex:1 1 260px}
+.lab-body{padding:18px}
+.lab-body>*:last-child{margin-bottom:0}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.group{display:grid;gap:7px}
+.group-title{font:600 11px/1.2 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:16px 22px;margin-bottom:16px}
+
+/* ---------- buttons ---------- */
+.btn{font:700 14.5px/1.15 var(--f-body);padding:9px 14px;border-radius:9px;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none;transition:box-shadow .15s,border-color .15s,background .15s}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn .cmd{font:400 12px/1 var(--f-mono);opacity:.8}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{box-shadow:0 0 0 3px var(--accent-soft)}
+.btn.mac{background:var(--mac-soft);border-color:transparent;color:var(--mac)}
+.btn.gh{background:var(--gh-soft);border-color:transparent;color:var(--gh)}
+.btn.live{background:var(--live-soft);border-color:transparent;color:var(--live)}
+.btn.mac:hover{box-shadow:inset 0 0 0 1.5px var(--mac)} .btn.gh:hover{box-shadow:inset 0 0 0 1.5px var(--gh)} .btn.live:hover{box-shadow:inset 0 0 0 1.5px var(--live)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn.is-done{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* ---------- pills ---------- */
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 11.5px/1 var(--f-mono);padding:5px 8px;border-radius:99px;white-space:nowrap;background:var(--surface-2);color:var(--muted)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.mac{background:var(--mac-soft);color:var(--mac)} .pill.gh{background:var(--gh-soft);color:var(--gh)} .pill.live{background:var(--live-soft);color:var(--live)}
+.pill.accent{background:var(--accent-soft);color:var(--accent)}
+
+/* ---------- narration ---------- */
+.say{border-radius:10px;padding:12px 14px;background:var(--surface-2);font-size:15.5px;margin-top:14px}
+.say.ok{background:var(--ok-soft)} .say.warn{background:var(--warn-soft)} .say.bad{background:var(--bad-soft)}
+.say .label{color:var(--muted)}
+.say.ok .label{color:var(--ok)} .say.warn .label{color:var(--warn)} .say.bad .label{color:var(--bad)}
+.win{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:12px 14px;background:var(--ok-soft);color:var(--ink);margin-top:12px;font-size:15.5px}
+.win b{color:var(--ok)}
+
+/* ---------- terminal / code ---------- */
+.term{background:var(--code-bg);color:var(--code-ink);border-radius:10px;overflow:hidden}
+.term-bar{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--code-line);color:var(--code-muted);font:12px/1.2 var(--f-mono)}
+.term pre,pre.code{margin:0;padding:12px 14px;font:13.5px/1.6 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto}
+pre.code{background:var(--code-bg);color:var(--code-ink);border-radius:10px;margin:12px 0 18px}
+.t-ok{color:var(--t-ok)} .t-err{color:var(--t-err)} .t-dim{color:var(--code-muted)} .t-key{color:var(--t-key)}
+.hot{cursor:pointer;border-radius:4px;padding:1px 2px;margin:0 -2px;box-shadow:inset 0 -2px 0 var(--t-key)}
+.hot:hover{background:var(--code-line)}
+.hot.sel{background:var(--t-key);color:var(--code-bg);box-shadow:none}
+
+/* ---------- editors ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:4px}
+.tab{font:12.5px/1.2 var(--f-mono);padding:7px 10px;border-radius:8px 8px 0 0;background:var(--surface-2);border:1px solid var(--line);border-bottom:0;cursor:pointer;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--code-bg);color:var(--code-ink);border-color:var(--code-bg)}
+textarea.code{display:block;width:100%;min-height:230px;font:13.5px/1.55 var(--f-mono);background:var(--code-bg);color:var(--code-ink);border:0;border-radius:0 10px 10px 10px;padding:12px 14px;resize:vertical;tab-size:2}
+.gutter-wrap{display:flex;background:var(--code-bg);border-radius:0 10px 10px 10px;overflow:hidden}
+.gutter{flex:none;padding:12px 0;min-width:40px;text-align:right;font:13.5px/1.55 var(--f-mono);color:var(--code-muted);user-select:none;overflow:hidden}
+.gutter div{padding:0 8px}
+.gutter div.err{background:var(--bad);color:#fff}
+.gutter-wrap textarea.code{border-radius:0;white-space:pre;overflow:auto;min-width:0}
+input[type="text"],input[type="search"],textarea.plain{font:inherit;font-size:15.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 12px;width:100%}
+textarea.plain{min-height:76px;resize:vertical}
+
+/* ---------- tables ---------- */
+.tbl{overflow-x:auto;margin:14px 0 24px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th{text-align:left;font:600 11px/1.3 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:700}
+.tbl td:first-child code{white-space:nowrap}
+.tbl.plainfirst td:first-child{font-weight:400}
+
+/* ---------- grids ---------- */
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.split,.three{grid-template-columns:minmax(0,1fr)} .four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.split>*,.three>*,.four>*{min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.card h3,.card h4{margin:0 0 6px}
+.card p{font-size:15px;margin-bottom:8px}
+.card p:last-child{margin-bottom:0}
+
+/* ---------- start page ---------- */
+.hero{padding-bottom:6px}
+.ideas{counter-reset:none;margin-top:30px}
+.idea{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;transition:border-color .15s}
+.idea:hover{border-color:var(--accent)}
+.idea .label{color:var(--accent);margin:0}
+.idea strong{font:700 18px/1.25 var(--f-display)}
+.idea span.d{font-size:14.5px;color:var(--muted)}
+.lesson-list{display:grid;gap:8px;margin:14px 0 8px}
+.lesson-link{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:13px 16px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);text-decoration:none;color:var(--ink)}
+.lesson-link:hover{border-color:var(--accent)}
+.lesson-link .n{font:700 22px/1 var(--f-display);color:var(--accent);width:24px;text-align:center}
+.lesson-link .t{font-weight:700}
+.lesson-link .d{display:block;font-size:14px;color:var(--muted);font-weight:400}
+.tool-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+@media (max-width:760px){.tool-list{grid-template-columns:minmax(0,1fr)}}
+.tool-link{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);text-decoration:none;color:var(--ink);font-weight:700;font-size:15px}
+.tool-link:hover{border-color:var(--accent)}
+.tool-link .ico{color:var(--accent);margin-top:1px}
+.tool-link small{display:block;font-weight:400;color:var(--muted);font-size:13.5px}
+
+/* ---------- lesson chrome ---------- */
+.lesson-foot{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;margin-top:60px;padding-top:22px;border-top:1px solid var(--line)}
+
+/* ---------- three places ---------- */
+.bigpic{display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);grid-template-areas:"mac arr gh" "down . ." "live . .";gap:0 10px;margin:26px 0 8px;align-items:stretch}
+.bp{border-radius:var(--r);padding:14px 16px;border:1.5px solid}
+.bp b{display:block;font:700 18px/1.2 var(--f-display)}
+.bp span{display:block;font-size:14px;color:var(--muted);margin-top:4px}
+.bp.mac{grid-area:mac;border-color:var(--mac);background:var(--mac-soft)} .bp.mac b{color:var(--mac)}
+.bp.gh{grid-area:gh;border-color:var(--gh);background:var(--gh-soft)} .bp.gh b{color:var(--gh)}
+.bp.live{grid-area:live;border-color:var(--live);background:var(--live-soft)} .bp.live b{color:var(--live)}
+.bp-arr{grid-area:arr;display:flex;flex-direction:column;justify-content:center;gap:8px;font:600 12.5px/1.2 var(--f-mono);color:var(--muted);text-align:center}
+.bp-arr span{display:block;padding:6px 0;border-bottom:2px solid var(--gh);position:relative}
+.bp-arr span+span{border-bottom:0;border-top:2px solid var(--mac)}
+.bp-down{grid-area:down;font:600 12.5px/1.3 var(--f-mono);color:var(--muted);padding:12px 0 12px 22px;border-left:2px solid var(--live);margin-left:28px}
+@media (max-width:640px){
+  .bigpic{grid-template-columns:minmax(0,1fr);grid-template-areas:"gh" "arr" "mac" "down" "live"}
+  .bp-arr{flex-direction:row;justify-content:flex-start;padding:10px 0 10px 22px;border-left:2px solid var(--gh);margin-left:28px;gap:16px}
+  .bp-arr span,.bp-arr span+span{border:0;padding:0}
+}
+.places{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:6px}
+@media (max-width:760px){.places{grid-template-columns:minmax(0,1fr)}}
+.place{border-radius:var(--r);padding:13px;border:1.5px solid;min-width:0}
+.place.mac{border-color:var(--mac);background:var(--mac-soft)} .place.gh{border-color:var(--gh);background:var(--gh-soft)} .place.live{border-color:var(--live);background:var(--live-soft)}
+.place-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.place-h h4{font-size:16px}
+.place.mac h4{color:var(--mac)} .place.gh h4{color:var(--gh)} .place.live h4{color:var(--live)}
+.kv{display:grid;gap:6px}
+.kv>div{background:var(--surface);border-radius:8px;padding:8px 10px}
+.kv .k{display:block;font:12px/1.3 var(--f-mono);color:var(--muted);overflow-wrap:anywhere}
+.kv .v{display:block;font-weight:700;font-size:15px;margin-top:2px}
+.kv .v .pill{margin-left:4px;vertical-align:1px}
+.browser{background:var(--surface);border-radius:8px;overflow:hidden}
+.browser-bar{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--surface-2);font:12px/1 var(--f-mono);color:var(--muted)}
+.browser-bar i{width:8px;height:8px;border-radius:50%;background:var(--line);display:inline-block}
+.browser-body{padding:12px 12px 10px}
+.browser-body .site-h{font:700 15px/1.2 var(--f-display);margin-bottom:10px}
+.browser-body footer{border-top:1px solid var(--line);padding-top:8px;font-size:13.5px;color:var(--muted)}
+.browser-body footer b{color:var(--ink)}
+.flash{animation:flash 1.3s ease-out}
+@keyframes flash{0%{box-shadow:0 0 0 3px var(--accent)}100%{box-shadow:0 0 0 3px transparent}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ---------- build sim ---------- */
+.bpage{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.bpage+.bpage{margin-top:10px}
+.bpage-bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 10px;background:var(--surface-2);font:12px/1.2 var(--f-mono);color:var(--muted)}
+.bpage-view{padding:10px 12px;font-size:14px}
+.bpage-view h1{font:700 17px/1.25 var(--f-display);margin:0 0 4px;letter-spacing:0}
+.bpage-view p{margin:0 0 4px}
+.bpage-view footer{margin-top:8px;padding-top:6px;border-top:1px dashed var(--line);color:var(--muted);font-size:13px}
+.bpage-view footer p{margin:0}
+.bpage-actions{display:flex;gap:6px;flex-wrap:wrap;padding:0 10px 10px}
+.bpage pre{margin:0 10px 10px;border-radius:8px;background:var(--code-bg);color:var(--code-ink);font:12px/1.5 var(--f-mono);padding:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.try{margin:0;padding-left:20px}
+.try li{font-size:15px}
+
+/* ---------- layers ---------- */
+.switches{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.switch{display:inline-flex;align-items:center;gap:9px;padding:8px 12px;border:1px solid var(--line);border-radius:99px;cursor:pointer;font-size:14.5px;background:var(--surface);user-select:none}
+.switch input{appearance:none;-webkit-appearance:none;width:34px;height:20px;border-radius:99px;background:var(--line);position:relative;margin:0;cursor:pointer;flex:none;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(14px)}
+.switch input:disabled{opacity:.6;cursor:default}
+.switch small{color:var(--muted)}
+.layer-host{display:block;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+
+/* ---------- markdown preview ---------- */
+.md-out{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-height:230px;font-size:15px}
+.md-out h1,.md-out h2,.md-out h3{margin:14px 0 6px;font-size:19px}
+.md-out h2:first-child{margin-top:0}
+.md-out p{margin:0 0 10px}
+.md-chart{border:1.5px dashed var(--live);color:var(--live);border-radius:8px;padding:14px;text-align:center;font-weight:700;margin:10px 0}
+.md-chart small{display:block;font-weight:400;color:var(--muted)}
+.md-fig{margin:10px 0}
+.md-img{background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 8px,var(--bg) 8px,var(--bg) 16px);border-radius:8px;padding:22px 12px;text-align:center;font:12.5px/1.3 var(--f-mono);color:var(--muted);overflow-wrap:anywhere}
+.md-fig figcaption{font-size:13px;color:var(--muted);margin-top:5px}
+.checks{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:5px;font-size:14.5px}
+.checks li{display:flex;gap:8px;align-items:flex-start;margin:0;max-width:none}
+
+/* ---------- decoder ---------- */
+.decoder{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:760px){.decoder{grid-template-columns:minmax(0,1fr)}}
+.explain{border-radius:10px;background:var(--surface-2);padding:14px}
+.explain .label{color:var(--accent)}
+.explain p{font-size:15.5px}
+
+/* ---------- troubleshooter ---------- */
+.ts-q{font-size:17px;font-weight:700;margin-bottom:12px}
+.ts-steps{display:flex;gap:6px;margin-bottom:12px}
+.ts-steps span{height:5px;flex:1;border-radius:99px;background:var(--surface-2)}
+.ts-steps span.on{background:var(--accent)}
+
+/* ---------- git ---------- */
+.mission{list-style:none;padding:0;margin:0 0 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 18px;counter-reset:m}
+@media (max-width:640px){.mission{grid-template-columns:minmax(0,1fr)}}
+.mission li{counter-increment:m;display:flex;gap:9px;align-items:flex-start;font-size:14.5px;margin:0;color:var(--muted);max-width:none}
+.mission li::before{content:counter(m);flex:none;width:21px;height:21px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font:600 11px/1 var(--f-mono);margin-top:1px}
+.mission li.next{color:var(--ink);font-weight:700}
+.mission li.next::before{border-color:var(--accent);color:var(--accent)}
+.mission li.done{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.mission li.done::before{content:"✓";background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.git-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+@media (max-width:760px){.git-grid{grid-template-columns:minmax(0,1fr)}}
+.git-place{border-radius:var(--r);padding:13px;border:1.5px solid;min-width:0;display:grid;gap:10px;align-content:start}
+.git-place.mac{border-color:var(--mac);background:var(--mac-soft)} .git-place.gh{border-color:var(--gh);background:var(--gh-soft)}
+.git-place h4{font-size:16px}
+.git-place.mac h4{color:var(--mac)} .git-place.gh h4{color:var(--gh)}
+.lanes{background:var(--surface);border-radius:8px;padding:8px 10px;overflow-x:auto}
+.lane{display:flex;align-items:center;gap:10px;padding:5px 0;min-width:max-content}
+.lane-name{font:600 12.5px/1 var(--f-mono);width:68px;flex:none}
+.dots{display:flex;align-items:center}
+.dot{width:15px;height:15px;border-radius:50%;flex:none;background:var(--accent);box-shadow:0 0 0 2px var(--surface)}
+.dot.k-practice{background:var(--mac)} .dot.k-gh{background:var(--gh)}
+.seg{width:12px;height:2px;background:var(--line);flex:none}
+.status{background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:10px 12px;font:12.5px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere;margin:0}
+.folder{background:var(--surface);border-radius:8px;padding:9px 11px;font:12.5px/1.55 var(--f-mono)}
+.folder .fh{color:var(--muted);margin-bottom:3px}
+.folder ul{list-style:none;padding:0;margin:0}
+.folder li{margin:0;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:none}
+.folder li.new{color:var(--ok)}
+.folder li.gone{color:var(--muted);text-decoration:line-through}
+.pr{background:var(--surface);border-radius:8px;padding:10px 12px;font-size:14.5px;display:grid;gap:8px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .dot{width:11px;height:11px;box-shadow:none}
+
+.terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:700px){.terms{grid-template-columns:minmax(0,1fr)}}
+.terms .term-card:last-child:nth-child(odd){grid-column:1/-1}
+.term-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
+.term-card h4{font-family:var(--f-mono);font-size:14.5px;font-weight:600;color:var(--accent);margin-bottom:4px}
+.term-card p{font-size:15px;margin:0}
+.term-card .an{display:block;font-size:13.5px;color:var(--muted);margin-top:6px}
+.cycle{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:14px 0}
+.cycle span{font:600 13px/1.2 var(--f-mono);padding:8px 11px;border-radius:8px;background:var(--mac-soft);color:var(--mac)}
+.cycle span.p{background:var(--gh-soft);color:var(--gh)}
+.cycle i{font-style:normal;color:var(--muted)}
+
+/* VS Code mock */
+.vsc{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:12px;font:13px/1.45 var(--f-body);max-width:340px}
+.vsc .h{font:600 11px/1 var(--f-mono);letter-spacing:.1em;color:var(--code-muted);margin-bottom:10px}
+.vsc .in{border:1px solid var(--code-line);border-radius:5px;padding:6px 8px;color:var(--code-ink);margin-bottom:8px}
+.vsc .b{background:#2F6FD0;color:#fff;border-radius:5px;padding:6px;text-align:center;font-weight:700;margin-bottom:10px}
+.vsc .f{display:flex;justify-content:space-between;gap:8px;font:12px/1.7 var(--f-mono);color:var(--code-ink)}
+.vsc .f em{font-style:normal;color:var(--t-key)}
+.vsc .s{margin-top:10px;border-top:1px solid var(--code-line);padding-top:8px;font:12px/1.2 var(--f-mono);color:var(--code-muted)}
+
+/* ---------- journey ---------- */
+.jsteps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.jstep{font:600 12.5px/1 var(--f-mono);padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;color:var(--muted)}
+.jstep.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.jstep.past{color:var(--ink)}
+.jcard h4{font-size:19px;margin-bottom:6px}
+.jstate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:16px}
+@media (max-width:700px){.jstate{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.js{border-radius:10px;padding:10px;border:1.5px solid var(--line);background:var(--surface);min-width:0}
+.js .k{display:block;font:11.5px/1.3 var(--f-mono);color:var(--muted)}
+.js .v{display:block;font-weight:700;margin-top:3px}
+.js.new{border-color:var(--ok);background:var(--ok-soft)} .js.new .v{color:var(--ok)}
+
+/* ---------- map ---------- */
+.finder{display:grid;gap:6px;margin-top:10px;max-height:360px;overflow:auto;padding-right:4px}
+.find-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;text-align:left;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface);cursor:pointer;color:var(--ink);font:inherit;font-size:15px;align-items:center}
+.find-row:hover{border-color:var(--accent)}
+.find-row.on{border-color:var(--accent);background:var(--accent-soft)}
+.find-row code{font-size:12.5px;justify-self:end;text-align:right}
+@media (max-width:600px){.find-row{grid-template-columns:minmax(0,1fr)} .find-row code{justify-self:start;text-align:left}}
+.answer{border-radius:10px;background:var(--accent-soft);padding:14px 16px;margin-top:14px}
+.answer .label{color:var(--accent)}
+.answer .path{font:600 16px/1.4 var(--f-mono);overflow-wrap:anywhere}
+.answer p{margin:6px 0 0;font-size:15px}
+.tree{font:13.5px/1.4 var(--f-mono);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;overflow-x:auto}
+.tree ul{list-style:none;margin:0;padding-left:18px;border-left:1px dashed var(--line);margin-left:10px}
+.tree>ul{padding-left:0;border:0;margin-left:0}
+.tree li{margin:2px 0;max-width:none}
+.node{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:5px 8px;border-radius:7px;cursor:pointer;border:0;background:none;color:var(--ink);font:inherit;text-align:left;width:100%}
+.node:hover{background:var(--surface-2)}
+.node.hl{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.node .nm{font-weight:600}
+.legend-badges{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+
+/* ---------- checklists, quiz ---------- */
+.check{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:15.5px}
+.check+.check{margin-top:6px}
+.check input{width:18px;height:18px;margin:3px 0 0;accent-color:var(--ok);flex:none}
+.check:has(input:checked){background:var(--ok-soft);border-color:transparent}
+.check:has(input:checked) span{color:var(--muted)}
+details.q{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:0;margin:8px 0}
+details.q summary{cursor:pointer;padding:13px 16px;font-weight:700;list-style:none;display:flex;gap:12px;align-items:baseline}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary .qn{font:700 13px/1 var(--f-mono);color:var(--accent);flex:none}
+details.q summary .rv{margin-left:auto;font:600 11px/1 var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em;flex:none}
+details.q[open] summary .rv{visibility:hidden}
+details.q .a{padding:0 16px 14px 42px;font-size:15.5px}
+details.q[open]{border-color:var(--accent)}
+.res{display:grid;gap:8px;margin-top:12px}
+.res a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.res a:hover{border-color:var(--accent)}
+.res a b{display:block}
+.res a span{font-size:14px;color:var(--muted)}
+.copy{font:600 11.5px/1 var(--f-mono);padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer}
+.copy:hover{color:var(--ink);border-color:var(--muted)}
+.cmd-cell{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cmd-cell code{white-space:nowrap}
+.out{background:var(--surface-2);border-radius:10px;padding:14px;font-size:15px;white-space:pre-wrap;margin:12px 0 10px;min-height:80px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-size:14px;cursor:pointer}
+.chip input{margin:0;accent-color:var(--accent)}
+.chip:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.field{display:grid;gap:6px;margin-bottom:14px}
+.field>label,.field>.lbl{font-weight:700;font-size:14.5px}
+</style>
+
+<div class="app">
+<aside class="rail" id="rail">
+  <div class="brand-row">
+    <a class="brand" href="#start"><span class="brand-small">SenseCellar</span><span class="brand-big">Web Lab</span></a>
+    <button class="btn sm rail-toggle" id="railToggle" type="button" aria-expanded="false" aria-controls="railNav">Lessons &amp; tools</button>
+  </div>
+  <div class="rail-nav" id="railNav">
+    <div class="progress"><div class="bar"><span id="progBar"></span></div><span id="progText">0 of 7 lessons done</span></div>
+    <nav class="nav" aria-label="Course">
+      <h2>Lessons</h2>
+      <a href="#places" data-lesson="places"><span class="num">1</span>Three places</a>
+      <a href="#build" data-lesson="build"><span class="num">2</span>Source vs built files</a>
+      <a href="#files" data-lesson="files"><span class="num">3</span>The files you touch</a>
+      <a href="#check" data-lesson="check"><span class="num">4</span>Build and check</a>
+      <a href="#git" data-lesson="git"><span class="num">5</span>Git and GitHub</a>
+      <a href="#publish" data-lesson="publish"><span class="num">6</span>Publishing</a>
+      <a href="#help" data-lesson="help"><span class="num">7</span>Asking for help</a>
+      <h2>Tools</h2>
+      <a href="#map"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>Where do I edit this?</a>
+      <a href="#commands"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></svg></span>Commands</a>
+      <a href="#glossary"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span>Glossary</a>
+      <a href="#quiz"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.6v.4"/><path d="M12 17h.01"/></svg></span>Revision quiz</a>
+      <a href="#next"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5"/></svg></span>What to learn next</a>
+      <a href="#project"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg></span>My project now</a>
+    </nav>
+    <p class="rail-foot">Everything here is a safe practice copy. Nothing touches your real project files.</p>
+  </div>
+</aside>
+
+<main id="main">
+
+<!-- ================= START ================= -->
+<section class="view" data-view="start" id="v-start">
+  <div class="hero">
+    <p class="eyebrow">Revision course · from your guide of 22 Oct 2026</p>
+    <h1>SenseCellar Web Lab</h1>
+    <p class="lede">Learn how your website is edited, built, saved and published by trying each step on a practice copy. Every example comes from your own project.</p>
+  </div>
+
+  <div class="three ideas">
+    <a class="idea" href="#places"><span class="label">Idea 1</span><strong>Three places</strong><span class="d">Your Mac, GitHub and the web host each hold a copy. Each changes only with its own step.</span></a>
+    <a class="idea" href="#build"><span class="label">Idea 2</span><strong>Edit source, not copies</strong><span class="d">You edit a few source files. The build writes every page in <code>public/</code> for you.</span></a>
+    <a class="idea" href="#git"><span class="label">Idea 3</span><strong>Commit, push, upload</strong><span class="d">Three different steps. Commit saves on your Mac, push backs up to GitHub, upload publishes.</span></a>
+  </div>
+
+  <h2>Lessons</h2>
+  <p class="muted">Lessons 1 and 2 are the core ideas. Lessons 3 to 6 are practical. Lesson 7 is about getting clear answers.</p>
+  <div class="lesson-list">
+    <a class="lesson-link" href="#places"><span class="n">1</span><span class="t">Your website lives in three places<span class="d">Simulator: follow one change from your Mac to the live site</span></span><span class="pill muted" data-status="places">To do</span></a>
+    <a class="lesson-link" href="#build"><span class="n">2</span><span class="t">Source files vs built files<span class="d">Simulator: run the build like a mail merge, break it, fix it</span></span><span class="pill muted" data-status="build">To do</span></a>
+    <a class="lesson-link" href="#files"><span class="n">3</span><span class="t">The files you touch<span class="d">Playgrounds: HTML/CSS/JS, a JSON checker, a Markdown preview</span></span><span class="pill muted" data-status="files">To do</span></a>
+    <a class="lesson-link" href="#check"><span class="n">4</span><span class="t">Build and check the site<span class="d">Error decoder and a "not seeing my change" checker</span></span><span class="pill muted" data-status="check">To do</span></a>
+    <a class="lesson-link" href="#git"><span class="n">5</span><span class="t">Git and GitHub<span class="d">Playground: branch, commit, push, merge and pull safely</span></span><span class="pill muted" data-status="git">To do</span></a>
+    <a class="lesson-link" href="#publish"><span class="n">6</span><span class="t">Publishing the live website<span class="d">Walkthrough: a new WhatsApp number, from edit to live</span></span><span class="pill muted" data-status="publish">To do</span></a>
+    <a class="lesson-link" href="#help"><span class="n">7</span><span class="t">Getting clear answers<span class="d">Help request builder</span></span><span class="pill muted" data-status="help">To do</span></a>
+  </div>
+
+  <h2>Look things up</h2>
+  <div class="tool-list">
+    <a class="tool-link" href="#map"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span>Where do I edit this?<small>Finder and folder map</small></span></a>
+    <a class="tool-link" href="#commands"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></svg></span><span>Commands<small>Build, Git and shortcuts</small></span></a>
+    <a class="tool-link" href="#glossary"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h11"/></svg></span><span>Glossary<small>25 terms, searchable</small></span></a>
+    <a class="tool-link" href="#quiz"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .9-1 1.6v.4"/><path d="M12 17h.01"/></svg></span><span>Revision quiz<small>12 questions with answers</small></span></a>
+    <a class="tool-link" href="#next"><span class="ico"><svg viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5"/></svg></span><span>What to learn next<small>Courses and a practice exercise</small></span></a>
+    <a class="tool-link" href="#project"><span class="ico"><svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/></svg></span><span>My project now<small>Status, launch to-dos, Mac setup</small></span></a>
+  </div>
+  <p class="small muted" style="margin-top:22px">Your progress and ticked boxes are saved in this browser only.</p>
+</section>
+
+<!-- ================= LESSON 1 ================= -->
+<section class="view" data-view="places" id="v-places" hidden>
+  <p class="eyebrow">Lesson 1 · Guide part 1</p>
+  <h1>Your website lives in three places</h1>
+  <p class="lede">Your Mac, GitHub and the web host each keep their own copy of the site. Each copy changes only when you do the step for it.</p>
+
+  <div class="bigpic" aria-label="Diagram of the three places">
+    <div class="bp mac"><b>1. Your Mac</b><span>The project folder. You edit and build here.</span></div>
+    <div class="bp-arr"><span>git push →</span><span>← git pull</span></div>
+    <div class="bp gh"><b>2. GitHub</b><span>Backup plus full history. Visitors never see it.</span></div>
+    <div class="bp-down">upload the contents of public/</div>
+    <div class="bp live"><b>3. Web host</b><span>The live website. This is what visitors see.</span></div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Place</th><th>What it is for</th><th>How it changes</th></tr></thead>
+      <tbody>
+        <tr><td>Your Mac</td><td>Where you edit files and build the pages</td><td>You edit, then run <code>python3 build.py</code></td></tr>
+        <tr><td>GitHub</td><td>A safe copy of the project and every past version</td><td><code>git push</code> (Mac → GitHub), <code>git pull</code> (GitHub → Mac)</td></tr>
+        <tr><td>Web host</td><td>The live site at sensecellar.com</td><td>Only when you upload <code>public/</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="key"><span class="label">Key idea</span>
+    <p>These are three separate places, and each update is a separate step. <b>Pushing to GitHub does not change the live website.</b> Editing a file on your Mac does not change GitHub until you commit and push.</p>
+  </div>
+
+  <div class="lab" id="placesLab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Follow one change through the three places</h3></div>
+    <div class="lab-body">
+      <p><b>Goal:</b> change the opening hours, then get them onto the live site <i>and</i> backed up on GitHub. Watch which box changes after each click.</p>
+      <div class="controls">
+        <div class="group"><span class="group-title">On your Mac</span>
+          <div class="row">
+            <button class="btn mac" type="button" data-p="edit">Edit the hours</button>
+            <button class="btn mac" type="button" data-p="build">Build <span class="cmd">python3 build.py</span></button>
+            <button class="btn mac" type="button" data-p="commit">Commit</button>
+          </div>
+        </div>
+        <div class="group"><span class="group-title">Mac → GitHub</span>
+          <div class="row"><button class="btn gh" type="button" data-p="push">Push</button></div>
+        </div>
+        <div class="group"><span class="group-title">Mac → web host</span>
+          <div class="row"><button class="btn live" type="button" data-p="upload">Upload public/</button></div>
+        </div>
+      </div>
+
+      <div class="places">
+        <div class="place mac">
+          <div class="place-h"><h4>Your Mac</h4><span id="psStatus"></span></div>
+          <div class="kv">
+            <div id="psSrcBox"><span class="k">content/en.json (source)</span><span class="v" id="psSrc"></span></div>
+            <div id="psBuiltBox"><span class="k">public/ (built pages)</span><span class="v" id="psBuilt"></span></div>
+          </div>
+        </div>
+        <div class="place gh">
+          <div class="place-h"><h4>GitHub</h4><span class="pill gh">backup</span></div>
+          <div class="kv">
+            <div id="psGSrcBox"><span class="k">content/en.json</span><span class="v" id="psGSrc"></span></div>
+            <div id="psGBuiltBox"><span class="k">public/</span><span class="v" id="psGBuilt"></span></div>
+          </div>
+        </div>
+        <div class="place live">
+          <div class="place-h"><h4>Web host</h4><span class="pill live">live</span></div>
+          <div class="browser" id="psLiveBox">
+            <div class="browser-bar"><i></i><i></i><i></i><span>sensecellar.com/en/</span></div>
+            <div class="browser-body"><div class="site-h">SenseCellar</div><footer>Opening hours<br><b id="psLive"></b></footer></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="say" id="psSay" aria-live="polite"></div>
+      <div class="win" id="psWin" hidden><span><b>Goal reached.</b> The new hours are live and backed up on GitHub. That took five separate steps: edit, build, commit, push and upload.</span></div>
+      <div class="row" style="margin-top:14px"><button class="btn sm ghost" type="button" data-p="reset">Start again</button></div>
+    </div>
+  </div>
+
+  <h3>Things to try</h3>
+  <ul>
+    <li><b>Push without uploading.</b> GitHub updates, but the live site keeps the old hours.</li>
+    <li><b>Upload without building.</b> Nothing changes for visitors, because <code>public/</code> was never rebuilt.</li>
+    <li><b>Commit before building.</b> The snapshot holds new wording but old pages. In this project you commit the source edits and the rebuilt <code>public/</code> together.</li>
+  </ul>
+
+  <div class="lesson-foot"><button class="btn" type="button" data-done="places">Mark lesson as done</button><a class="btn primary" href="#build">Next: Source vs built files →</a></div>
+</section>
+
+<!-- ================= LESSON 2 ================= -->
+<section class="view" data-view="build" id="v-build" hidden>
+  <p class="eyebrow">Lesson 2 · Guide part 2</p>
+  <h1>Source files vs built files</h1>
+  <p class="lede">This is the most important idea in the guide. You edit a small set of source files. The build turns them into finished pages.</p>
+
+  <div class="key"><span class="label">The one-sentence answer</span>
+    <p>The footer is written once in <code>partials/_footer.html</code>. The build copies it into every page, because a web host can only send complete pages. So you edit the one source file and rebuild, and never edit the copies.</p>
+  </div>
+
+  <h2>It works like mail merge</h2>
+  <p>In Word, one letter template with «Name» fields plus a list of names produces 100 printed letters. Your website works the same way.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Mail merge</th><th>This website</th></tr></thead>
+      <tbody>
+        <tr><td>Letter template with «Name» fields</td><td><code>templates/*.html</code> and <code>partials/*.html</code>, with <code>{{key}}</code> fields</td></tr>
+        <tr><td>The list of names and addresses</td><td><code>content/zh-hk.json</code>, <code>content/en.json</code>, <code>data/*.json</code>, article <code>.md</code> files</td></tr>
+        <tr><td>The "Merge" button</td><td><code>python3 build.py</code></td></tr>
+        <tr><td>The printed letters</td><td>Everything in <code>public/zh-hk/</code> and <code>public/en/</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>To change the letterhead, you fix the template and merge again. You don't correct 100 printed letters by hand. If you did, the next merge would print over your corrections.</p>
+
+  <div class="lab" id="buildLab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Build simulator: a small copy of your site</h3></div>
+    <div class="lab-body">
+      <div class="split">
+        <div>
+          <p class="group-title" style="margin-bottom:8px">Source files: you edit these</p>
+          <div class="tabs" id="bsTabs" role="tablist"></div>
+          <textarea class="code" id="bsEditor" spellcheck="false" aria-label="Source file editor"></textarea>
+          <div class="row" style="margin-top:10px">
+            <button class="btn primary" type="button" id="bsBuild">Build <span class="cmd">python3 build.py</span></button>
+            <button class="btn sm ghost" type="button" id="bsReset">Reset files</button>
+          </div>
+        </div>
+        <div>
+          <p class="group-title" style="margin-bottom:8px">public/en/: built pages, never edit</p>
+          <div id="bsPages"></div>
+        </div>
+      </div>
+      <div class="term" style="margin-top:14px">
+        <div class="term-bar"><span>Terminal</span><span id="bsTermState"></span></div>
+        <pre id="bsTerm"></pre>
+      </div>
+      <div class="say" id="bsSay" aria-live="polite" hidden></div>
+      <h4 style="margin:18px 0 6px">Try these, one at a time</h4>
+      <ol class="try">
+        <li>In <code>content/en.json</code>, change the opening hours. Click Build. All three pages update.</li>
+        <li>In <code>partials/_footer.html</code>, change the word "WhatsApp". One edit changes every page.</li>
+        <li>Change <code>{{footer.hours}}</code> to <code>{{footer.hourz}}</code> and build. Read the error, then fix it.</li>
+        <li>Delete a comma in <code>content/en.json</code> and build.</li>
+        <li>Click <b>Edit this built copy</b> on a page, then build again. Watch your edit disappear.</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>What the {{ }} signs mean</h2>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>You write</th><th>The build replaces it with</th></tr></thead>
+      <tbody>
+        <tr><td><code>{{footer.hours}}</code></td><td>The text at <code>"footer"</code> → <code>"hours"</code> in <code>content/zh-hk.json</code> (or <code>en.json</code> for English pages)</td></tr>
+        <tr><td><code>{{site.social.instagram}}</code></td><td>The value at <code>"social"</code> → <code>"instagram"</code> in <code>data/site.json</code></td></tr>
+        <tr><td><code>{{&gt;_footer}}</code></td><td>The whole file <code>partials/_footer.html</code></td></tr>
+        <tr><td><code>{{@price_table}}</code></td><td>Something the build generates itself (here, the price table from <code>data/plans.json</code>)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The build checks every page. If a <code>{{ }}</code> has no value (usually a typo), it stops and tells you which file to fix.</p>
+
+  <h2>How to spot a built file</h2>
+  <p>Every built page starts with a comment like this:</p>
+  <pre class="code">&lt;!doctype html&gt;
+<span class="t-key">&lt;!-- Built by build.py from templates/club.html and content/en.json. Do not edit this file: the next build replaces it. --&gt;</span></pre>
+  <p>If you open a file and see this line, <b>close it</b> and edit the files it names instead.</p>
+
+  <h2>Why not let the browser put the pieces together?</h2>
+  <p>It's possible, but worse: the page appears in stages, and search engines may miss content. Building complete pages in advance is the standard approach. Tools like Jekyll, Hugo and Eleventy work the same way, and <code>build.py</code> is a small version of them.</p>
+
+  <div class="lesson-foot"><button class="btn" type="button" data-done="build">Mark lesson as done</button><a class="btn primary" href="#files">Next: The files you touch →</a></div>
+</section>
+
+<!-- ================= LESSON 3 ================= -->
+<section class="view" data-view="files" id="v-files" hidden>
+  <p class="eyebrow">Lesson 3 · Guide part 4</p>
+  <h1>The files you touch</h1>
+  <p class="lede">A web page is made of three languages. You will mostly edit two simpler formats: JSON for wording and data, and Markdown for articles.</p>
+
+  <h2>HTML, CSS and JavaScript</h2>
+  <div class="three">
+    <div class="card"><h4>HTML</h4><p>Structure and content: headings, paragraphs, links, images.</p><p class="muted small">Like the walls and rooms of a house.<br>In <code>templates/</code>, <code>partials/</code></p></div>
+    <div class="card"><h4>CSS</h4><p>Appearance: colours, fonts, spacing, layout on phones.</p><p class="muted small">Like paint and furniture.<br>In <code>public/assets/css/site.css</code></p></div>
+    <div class="card"><h4>JavaScript</h4><p>Behaviour: menus that open, the storage calculator.</p><p class="muted small">Like electricity: things that move or respond.<br>In <code>public/assets/js/</code></p></div>
+  </div>
+
+  <div class="lab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Switch the layers on and off</h3></div>
+    <div class="lab-body">
+      <div class="switches">
+        <label class="switch"><input type="checkbox" checked disabled> HTML <small>walls</small></label>
+        <label class="switch"><input type="checkbox" id="lyCss" checked> CSS <small>paint</small></label>
+        <label class="switch"><input type="checkbox" id="lyJs" checked> JavaScript <small>electricity</small></label>
+      </div>
+      <div class="split">
+        <div>
+          <div class="layer-host" id="lyHost"></div>
+          <div class="say" id="lySay" aria-live="polite">Click <b>Menu</b> in the preview. Then switch CSS or JavaScript off and click it again.</div>
+        </div>
+        <div>
+          <div class="tabs" id="lyTabs" role="tablist">
+            <button class="tab" type="button" role="tab" aria-selected="true" data-ly="html">HTML</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-ly="css">CSS</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-ly="js">JavaScript</button>
+          </div>
+          <pre class="code" id="lyCode" style="margin-top:0;border-radius:0 10px 10px 10px;max-height:330px;font-size:12.5px"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>JSON: the rules that keep the build working</h2>
+  <pre class="code">{
+  <span class="t-key">"footer"</span>: {
+    <span class="t-key">"h_contact"</span>: "聯絡我們",
+    <span class="t-key">"copy"</span>: "© 2026 SenseCellar"
+  }
+}</pre>
+  <ol>
+    <li>Every text value goes in <b>straight double quotes</b> <code>"…"</code>. Curly quotes <code>“…”</code> don't work.</li>
+    <li>Put a <b>comma between items</b>, and <b>no comma after the last item</b>.</li>
+    <li>Every <code>{</code> needs a matching <code>}</code>, and every <code>[</code> a matching <code>]</code>.</li>
+    <li>A double quote inside the text must be written <code>\"</code>. Chinese quotes 「」 are fine as they are.</li>
+  </ol>
+
+  <div class="lab">
+    <div class="lab-head"><span class="label">Try it</span><h3>JSON checker</h3></div>
+    <div class="lab-body">
+      <p>Each example has one common mistake. Read the explanation, then fix the text yourself. The check runs as you type.</p>
+      <div class="row" style="margin-bottom:12px" id="jsExamples">
+        <button class="btn sm" type="button" data-ex="comma">Missing comma</button>
+        <button class="btn sm" type="button" data-ex="extra">Extra comma</button>
+        <button class="btn sm" type="button" data-ex="curly">Curly quotes</button>
+        <button class="btn sm" type="button" data-ex="quote">Quote inside text</button>
+        <button class="btn sm" type="button" data-ex="brace">Missing bracket</button>
+        <button class="btn sm" type="button" data-ex="ok">Valid file</button>
+      </div>
+      <div class="gutter-wrap">
+        <div class="gutter" id="jsGutter" aria-hidden="true"></div>
+        <textarea class="code" id="jsEditor" spellcheck="false" wrap="off" aria-label="JSON editor" style="min-height:190px"></textarea>
+      </div>
+      <div class="say" id="jsSay" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="note"><span class="label">Tips</span>
+    <p>VS Code underlines JSON mistakes in red, so check for red marks before building. If the build ends with <code>JSONDecodeError: Expecting ',' delimiter: line 12 column 5</code>, go to <b>line 12</b> of the JSON file you just edited.</p>
+    <p>Some wording fields allow simple HTML, for example <code>&lt;br&gt;</code> for a line break, as in the guides hub line 「親臨酒窖&lt;br&gt;實地體驗專屬空間」.</p>
+  </div>
+
+  <h2>Markdown: the article format</h2>
+  <p>Guide articles are written in Markdown, a plain-text format with a few symbols for headings, bold text, lists, links and photos.</p>
+  <div class="lab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Markdown live preview</h3></div>
+    <div class="lab-body">
+      <div class="split">
+        <div><p class="group-title" style="margin-bottom:8px">content/guides/zh-hk/&lt;slug&gt;.md</p><textarea class="code" id="mdEditor" spellcheck="false" aria-label="Markdown editor" style="min-height:330px;border-radius:10px"></textarea></div>
+        <div><p class="group-title" style="margin-bottom:8px">How it will look</p><div class="md-out" id="mdOut"></div></div>
+      </div>
+      <ul class="checks" id="mdChecks"></ul>
+    </div>
+  </div>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>You type</th><th>You get</th></tr></thead>
+      <tbody>
+        <tr><td><code>## Heading</code></td><td>A small heading</td></tr>
+        <tr><td><code>**bold**</code></td><td><b>bold</b> text</td></tr>
+        <tr><td><code>- item</code></td><td>A bullet list item</td></tr>
+        <tr><td><code>[text](https://…)</code></td><td>A link</td></tr>
+        <tr><td><code>![description](guides/photo.jpg "caption")</code></td><td>A photo with a caption shown under it</td></tr>
+        <tr><td><code>[[climate]]</code></td><td>The Hong Kong climate chart</td></tr>
+        <tr><td><code>## 關於 SenseCellar</code></td><td>The closing section. Every article must end with it.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="lesson-foot"><button class="btn" type="button" data-done="files">Mark lesson as done</button><a class="btn primary" href="#check">Next: Build and check →</a></div>
+</section>
+
+<!-- ================= LESSON 4 ================= -->
+<section class="view" data-view="check" id="v-check" hidden>
+  <p class="eyebrow">Lesson 4 · Guide part 5</p>
+  <h1>Build and check the site</h1>
+  <p class="lede">Run the build, look at the result in your browser, and know how to read the message when something goes wrong.</p>
+
+  <h2>Open the terminal in VS Code</h2>
+  <p>Use the menu <b>Terminal → New Terminal</b>, or the shortcut <kbd>Control</kbd> + <kbd>`</kbd>. The terminal opens in the project folder.</p>
+
+  <h2>The two build commands</h2>
+  <div class="split">
+    <div class="card"><div class="cmd-cell"><code>python3 build.py</code><button class="copy" type="button" data-copy="python3 build.py">Copy</button></div><p style="margin-top:10px">Builds the real website.</p><p class="small muted">Output: <code>public/</code></p></div>
+    <div class="card"><div class="cmd-cell"><code>python3 build.py --preview</code><button class="copy" type="button" data-copy="python3 build.py --preview">Copy</button></div><p style="margin-top:10px">Also builds articles marked <code>ready</code> (not yet live), so you can review them.</p><p class="small muted">Output: <code>_preview/</code>. <b>Never upload it.</b></p></div>
+  </div>
+  <p style="margin-top:16px">To check the result, double-click <code>public/index.html</code> in Finder (or <code>_preview/index.html</code> after a preview build). It opens in your browser.</p>
+
+  <h2>Reading the result</h2>
+  <div class="lab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Error decoder: click the underlined parts</h3></div>
+    <div class="lab-body">
+      <div class="tabs" role="tablist" id="dcTabs">
+        <button class="tab" type="button" role="tab" aria-selected="false" data-dc="ok">Success</button>
+        <button class="tab" type="button" role="tab" aria-selected="true" data-dc="fail">Build failed</button>
+        <button class="tab" type="button" role="tab" aria-selected="false" data-dc="tb">Long Python error</button>
+      </div>
+      <div class="decoder">
+        <div class="term" style="border-top-left-radius:0">
+          <div class="term-bar"><span>Terminal</span><span>example</span></div>
+<pre data-dcp="ok" hidden><span class="t-dim">$ python3 build.py</span>
+<span class="hot" tabindex="0" role="button" data-x="ok1">built zh-hk/index.html</span>
+built zh-hk/club.html
+built zh-hk/app.html
+built en/index.html
+built en/club.html
+<span class="t-dim">…</span></pre>
+<pre data-dcp="fail"><span class="t-dim">$ python3 build.py</span>
+<span class="t-err hot" tabindex="0" role="button" data-x="f0">build failed; public/ was not changed.</span> Fix:
+  - <span class="hot" tabindex="0" role="button" data-x="f1">{{footer.hourz}} is not filled in</span> <span class="hot" tabindex="0" role="button" data-x="f2">(partials/_footer.html)</span> <span class="hot" tabindex="0" role="button" data-x="f3">on 35 pages, e.g. en/app.html</span></pre>
+<pre data-dcp="tb" hidden><span class="t-dim">$ python3 build.py</span>
+<span class="hot" tabindex="0" role="button" data-x="t1">Traceback (most recent call last):
+  File "build.py", line …, in &lt;module&gt;
+    main()
+  File "build.py", line …, in load_json
+    return json.load(f)
+  …</span>
+<span class="t-err hot" tabindex="0" role="button" data-x="t2">json.decoder.JSONDecodeError: Expecting ',' delimiter: line 12 column 5</span></pre>
+        </div>
+        <div class="explain" id="dcExplain" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Not seeing your change in the browser?</h2>
+  <div class="lab">
+    <div class="lab-head"><span class="label">Check</span><h3>Three questions, in order</h3></div>
+    <div class="lab-body" id="tsBox"></div>
+  </div>
+
+  <div class="lesson-foot"><button class="btn" type="button" data-done="check">Mark lesson as done</button><a class="btn primary" href="#git">Next: Git and GitHub →</a></div>
+</section>
+
+<!-- ================= LESSON 5 ================= -->
+<section class="view" data-view="git" id="v-git" hidden>
+  <p class="eyebrow">Lesson 5 · Guide part 6</p>
+  <h1>Git and GitHub</h1>
+  <p class="lede">Git keeps every saved version of the project on your Mac. GitHub keeps a copy online. The playground below lets you try every step without risk.</p>
+
+  <div class="four">
+    <div class="card"><h4>History</h4><p>Every saved version is kept, with a note saying what changed.</p></div>
+    <div class="card"><h4>Undo</h4><p>You can go back to any earlier version.</p></div>
+    <div class="card"><h4>Backup</h4><p>GitHub holds a full copy if your Mac fails.</p></div>
+    <div class="card"><h4>Review</h4><p>Changes can be checked before they become official.</p></div>
+  </div>
+
+  <h2>The everyday cycle</h2>
+  <div class="cycle"><span>edit files</span><i>→</i><span>python3 build.py</span><i>→</i><span>check in browser</span><i>→</i><span>commit</span><i>→</i><span class="p">push</span></div>
+  <p>In this project the built pages in <code>public/</code> are saved in Git too. So commit your source edits <b>and</b> the rebuilt <code>public/</code> together.</p>
+
+  <div class="lab" id="gitLab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Git playground: the practice exercise, safely</h3></div>
+    <div class="lab-body">
+      <p class="small muted" style="margin-bottom:10px">Follow the steps, or click anything to see what happens. Each dot is a commit.</p>
+      <ol class="mission" id="gMission"></ol>
+      <div class="controls">
+        <div class="group"><span class="group-title">On your Mac</span>
+          <div class="row" id="gMacBtns">
+            <button class="btn mac" type="button" data-g="edit">Write an article</button>
+            <button class="btn mac" type="button" data-g="commit">Commit</button>
+            <button class="btn mac" type="button" data-g="branch">Create branch "practice"</button>
+            <span id="gSwitchBtns" class="row"></span>
+            <button class="btn mac" type="button" data-g="delete" id="gDelete">Delete branch practice</button>
+          </div>
+        </div>
+        <div class="group"><span class="group-title">Mac ↔ GitHub</span>
+          <div class="row">
+            <button class="btn gh" type="button" data-g="push">Push</button>
+            <button class="btn gh" type="button" data-g="pull">Pull</button>
+          </div>
+        </div>
+      </div>
+      <div class="git-grid">
+        <div class="git-place mac">
+          <div class="place-h" style="margin:0"><h4>Your Mac</h4><span class="pill mac" id="gHeadPill"></span></div>
+          <div class="lanes" id="gLocal"></div>
+          <pre class="status" id="gStatus"></pre>
+          <div class="folder" id="gFolder"></div>
+        </div>
+        <div class="git-place gh">
+          <div class="place-h" style="margin:0"><h4>GitHub</h4><span class="pill gh">origin</span></div>
+          <div class="lanes" id="gRemote"></div>
+          <div class="pr" id="gPR"></div>
+          <div class="row"><button class="btn gh sm" type="button" data-g="ghedit">Someone edits main on GitHub</button></div>
+        </div>
+      </div>
+      <div class="legend"><span><i class="dot"></i>commit made on main</span><span><i class="dot k-practice"></i>commit made on practice</span><span><i class="dot k-gh"></i>commit made on GitHub</span></div>
+      <div class="say" id="gSay" aria-live="polite"></div>
+      <div class="row" style="margin-top:14px"><button class="btn sm ghost" type="button" data-g="reset">Start again</button></div>
+    </div>
+  </div>
+
+  <h2>The words, explained</h2>
+  <div class="terms">
+    <div class="term-card"><h4>Repository (repo)</h4><p>The project folder plus its complete history.</p><span class="an">Like a binder with every draft kept.</span></div>
+    <div class="term-card"><h4>Commit</h4><p>A saved snapshot with a short message. It stays <b>only on your Mac</b> until you push.</p><span class="an">Like a save point in a video game.</span></div>
+    <div class="term-card"><h4>Push</h4><p>Send your new commits from your Mac to GitHub.</p><span class="an">Uploading your save points to the cloud.</span></div>
+    <div class="term-card"><h4>Pull</h4><p>Fetch new commits from GitHub to your Mac.</p><span class="an">Downloading save points made elsewhere.</span></div>
+    <div class="term-card"><h4>Branch</h4><p>A separate line of work, so you can make changes without touching the official version.</p><span class="an">A photocopy of the document to scribble on.</span></div>
+    <div class="term-card"><h4>main</h4><p>The main branch: the official version of the project.</p><span class="an">The master copy.</span></div>
+    <div class="term-card"><h4>Checkout / switch</h4><p>Change which branch your folder shows. <b>The files on your Mac change to match that branch.</b></p><span class="an">Swapping which binder is open on your desk.</span></div>
+    <div class="term-card"><h4>Merge</h4><p>Bring one branch's commits into another, e.g. finished work into main.</p><span class="an">Copying approved edits into the master copy.</span></div>
+    <div class="term-card"><h4>Pull request (PR)</h4><p>A page on GitHub that proposes merging a branch into main. You review it, then click <b>Merge</b>.</p><span class="an">Asking for sign-off before updating the master copy.</span></div>
+    <div class="term-card"><h4>Fast-forward</h4><p>A merge where main just moves forward, because nothing new happened on main meanwhile.</p><span class="an">Adding pages to the end of the binder: nothing to reconcile.</span></div>
+    <div class="term-card"><h4>Ahead / behind</h4><p>"ahead 2": your Mac has 2 commits GitHub doesn't. "behind 4": GitHub has 4 your Mac doesn't.</p></div>
+    <div class="term-card"><h4>Untracked file</h4><p>A file Git doesn't know about, e.g. the <code>app 2.html</code> copies iCloud made.</p><span class="an">A loose sheet that isn't in the binder.</span></div>
+    <div class="term-card"><h4>.gitignore</h4><p>A list of files Git deliberately ignores, e.g. <code>.DS_Store</code>, <code>_preview/</code>.</p><span class="an">A "do not file" list.</span></div>
+  </div>
+
+  <div class="note"><span class="label">Why we didn't switch to main before the merge</span>
+    <p>Switching to a branch makes your folder show <i>that branch's</i> files. Old main didn't have the 20 guides yet, so your folder would have looked as if the work had vanished. Nothing would have been lost (it was safe on the other branch), but it would have been confusing. After the merge, main had everything, so switching was safe. Step 5 of the playground shows exactly this.</p>
+  </div>
+
+  <h2>Three ways to do the Git steps</h2>
+  <p>Pick one and stick with it.</p>
+  <div class="tabs" role="tablist" id="wayTabs">
+    <button class="tab" type="button" role="tab" aria-selected="true" data-way="vs">VS Code (recommended)</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-way="gd">GitHub Desktop</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-way="tm">Terminal</button>
+  </div>
+  <div class="card" style="border-top-left-radius:0">
+    <div data-wayp="vs">
+      <div class="split">
+        <div>
+          <ol>
+            <li>Click the <b>Source Control</b> icon in the left bar (it looks like a branching line).</li>
+            <li>Changed files are listed there.</li>
+            <li>Type a message, then click <b>Commit</b>.</li>
+            <li>Click <b>Sync Changes</b>. It pushes and pulls.</li>
+          </ol>
+          <p class="small muted">The branch name is at the bottom left of the window. Click it to switch or create a branch.</p>
+        </div>
+        <div class="vsc" aria-label="Sketch of the VS Code Source Control panel">
+          <div class="h">SOURCE CONTROL</div>
+          <div class="in">Update phone number in site.json</div>
+          <div class="b">✓ Commit</div>
+          <div class="f"><span>data/site.json</span><em>M</em></div>
+          <div class="f"><span>public/en/contact.html</span><em>M</em></div>
+          <div class="f"><span>public/zh-hk/contact.html</span><em>M</em></div>
+          <div class="s">after committing: Sync Changes 1↑</div>
+        </div>
+      </div>
+    </div>
+    <div data-wayp="gd" hidden><p>GitHub Desktop is a free app with buttons for everything: commit, push, pull, branches and pull requests. Download it from <a href="https://desktop.github.com" target="_blank" rel="noopener">desktop.github.com</a>.</p></div>
+    <div data-wayp="tm" hidden>
+      <div class="tbl" style="margin:0">
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th><th>Risk</th></tr></thead>
+          <tbody>
+            <tr><td><code>git status</code></td><td>Shows what changed and which branch you're on. <b>Run it often.</b></td><td><span class="pill ok">None</span></td></tr>
+            <tr><td><code>git add &lt;file&gt;</code></td><td>Choose files for the next commit</td><td><span class="pill ok">None</span></td></tr>
+            <tr><td><code>git commit -m "message"</code></td><td>Save a snapshot with a message</td><td><span class="pill ok">None</span></td></tr>
+            <tr><td><code>git push</code></td><td>Send commits to GitHub</td><td><span class="pill">Low</span></td></tr>
+            <tr><td><code>git pull</code></td><td>Get commits from GitHub</td><td><span class="pill">Low</span></td></tr>
+            <tr><td><code>git log --oneline</code></td><td>Show the history, one line per commit</td><td><span class="pill ok">None</span></td></tr>
+            <tr><td><code>git switch main</code></td><td>Switch branch; your files change to match. Older form: <code>git checkout main</code></td><td><span class="pill">Low, if committed first</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <h2>Good commit messages</h2>
+  <p>Say <b>what</b> changed and, if it isn't obvious, <b>why</b>. Write it as a short command.</p>
+  <div class="lab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Commit message checker</h3></div>
+    <div class="lab-body">
+      <input type="text" id="cmInput" value="update" aria-label="Commit message">
+      <div class="row" style="margin-top:10px">
+        <button class="btn sm" type="button" data-cm="update">update</button>
+        <button class="btn sm" type="button" data-cm="Updated the footer">Updated the footer</button>
+        <button class="btn sm" type="button" data-cm="Update phone number in site.json">Update phone number in site.json</button>
+        <button class="btn sm" type="button" data-cm="Add 酒窖手記 article on wine auctions">Add 酒窖手記 article on wine auctions</button>
+      </div>
+      <div class="say" id="cmSay" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <h2>Safe vs risky</h2>
+  <div class="split">
+    <div class="card" style="background:var(--ok-soft);border-color:transparent"><h4 style="color:var(--ok)">Safe: can be undone</h4>
+      <ul style="margin:0"><li>Commit, push to a branch, pull</li><li>Opening a pull request</li><li>Switching branch after committing</li></ul></div>
+    <div class="card" style="background:var(--bad-soft);border-color:transparent"><h4 style="color:var(--bad)">Be careful: ask first</h4>
+      <ul style="margin:0"><li>Anything with <code>--force</code>, <code>reset --hard</code> or <code>clean</code></li><li>Deleting a branch that has <b>not</b> been merged</li><li>Deleting untracked files: Git can't restore files it never saved</li><li>Switching branch with uncommitted changes</li></ul></div>
+  </div>
+  <div class="key"><span class="label">Golden rule</span><p>When unsure, run <code>git status</code> and ask before doing anything that says <i>force</i>, <i>reset</i> or <i>delete</i>.</p></div>
+
+  <div class="lesson-foot"><button class="btn" type="button" data-done="git">Mark lesson as done</button><a class="btn primary" href="#publish">Next: Publishing →</a></div>
+</section>
+
+<!-- ================= LESSON 6 ================= -->
+<section class="view" data-view="publish" id="v-publish" hidden>
+  <p class="eyebrow">Lesson 6 · Guide part 7</p>
+  <h1>Publishing the live website</h1>
+  <p class="lede">The live site changes only when you upload the contents of <code>public/</code> to your web host.</p>
+
+  <h2>The three rules</h2>
+  <ol>
+    <li>Run <code>python3 build.py</code>. It must end without "build failed".</li>
+    <li>Upload the <b>contents</b> of <code>public/</code> to the web host.</li>
+    <li><b>Never upload</b> these folders:</li>
+  </ol>
+  <div class="chips" style="margin:-4px 0 18px 22px">
+    <span class="pill bad">_preview/</span><span class="pill bad">_source/</span><span class="pill bad">content/</span><span class="pill bad">templates/</span><span class="pill bad">partials/</span><span class="pill bad">data/</span>
+  </div>
+  <div class="key"><span class="label">Remember</span><p>GitHub and the host are <b>not connected</b> today, so pushing to GitHub changes nothing for visitors.</p></div>
+
+  <h2>Journey of one change</h2>
+  <p>Everything from lessons 1 to 5 in one run: the shop gets a new WhatsApp number.</p>
+  <div class="lab">
+    <div class="lab-head"><span class="label">Walkthrough</span><h3>New WhatsApp number: from edit to live</h3></div>
+    <div class="lab-body">
+      <div class="jsteps" id="jSteps"></div>
+      <div class="jcard" id="jCard"></div>
+      <div class="jstate" id="jState"></div>
+      <div class="row" style="margin-top:16px;justify-content:space-between">
+        <button class="btn" type="button" id="jBack">← Back</button>
+        <button class="btn primary" type="button" id="jNext">Next step →</button>
+      </div>
+    </div>
+  </div>
+
+  <h2>Possible later: automatic publishing</h2>
+  <div class="split">
+    <div class="card"><span class="pill mac">Today</span><h4 style="margin-top:10px">You upload by hand</h4><p>Push backs up to GitHub. A separate upload of <code>public/</code> publishes. Mistakes on GitHub never reach visitors by accident.</p></div>
+    <div class="card"><span class="pill live">Possible later</span><h4 style="margin-top:10px">The host publishes from GitHub</h4><p>Hosts such as Netlify or Cloudflare Pages can publish automatically whenever main changes. That saves the upload step, but main then <i>is</i> the live site, so you'd use branches and pull requests for every change.</p></div>
+  </div>
+  <p style="margin-top:14px" class="muted">Something to decide once you're comfortable with Git.</p>
+
+  <div class="lesson-foot"><button class="btn" type="button" data-done="publish">Mark lesson as done</button><a class="btn primary" href="#help">Next: Asking for help →</a></div>
+</section>
+
+<!-- ================= LESSON 7 ================= -->
+<section class="view" data-view="help" id="v-help" hidden>
+  <p class="eyebrow">Lesson 7 · Guide part 9</p>
+  <h1>Getting clear answers</h1>
+  <p class="lede">Tips from our sessions for asking Claude, or any helper, so the answer fits what you want.</p>
+
+  <ul>
+    <li><b>Answer options with the number or name.</b> When offered "1, 2 or 3", reply "2" or "open a pull request". A "yes" can't be matched to one option.</li>
+    <li><b>Say exactly which part is unclear.</b> "I don't understand <i>fast-forward</i>" gets a better answer than asking the whole question again.</li>
+    <li><b>Ask for the level you want:</b> "explain briefly", "explain as if I'm new to this", "give me a step-by-step".</li>
+    <li><b>Before anything risky, ask:</b> "What will this change, and can it be undone?"</li>
+    <li><b>When you stop an action, add one line saying why</b>, e.g. "don't change main yet". Then the next suggestion can fit.</li>
+    <li><b>State the goal and the limits together</b>, e.g. "Push everything to GitHub; the live site is separate."</li>
+    <li><b>Ask "where do I edit this?"</b> rather than editing a file in <code>public/</code>.</li>
+    <li><b>End with:</b> "Summarise what changed and what I need to do next."</li>
+  </ul>
+
+  <h2>Use the precise words</h2>
+  <div class="tbl plainfirst">
+    <table>
+      <thead><tr><th>You mean…</th><th>Say</th></tr></thead>
+      <tbody>
+        <tr><td>Keep the change in the file</td><td><b>save</b></td></tr>
+        <tr><td>Make a snapshot in Git</td><td><b>commit</b></td></tr>
+        <tr><td>Send to GitHub</td><td><b>push</b></td></tr>
+        <tr><td>Bring a branch into main</td><td><b>merge</b></td></tr>
+        <tr><td>Put it on the live website</td><td><b>publish</b> or <b>upload to the host</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="lab">
+    <div class="lab-head"><span class="label">Try it</span><h3>Help request builder</h3></div>
+    <div class="lab-body">
+      <div class="field"><label for="hbGoal">What do you want to happen?</label><textarea class="plain" id="hbGoal">Change the opening hours on the English contact page.</textarea></div>
+      <div class="field"><span class="lbl">Limits</span>
+        <div class="chips" id="hbLimits">
+          <label class="chip"><input type="checkbox" value="Don't change main yet." checked> Don't change main yet</label>
+          <label class="chip"><input type="checkbox" value="The live site is separate: don't publish anything."> The live site is separate</label>
+          <label class="chip"><input type="checkbox" value="Don't delete any files."> Don't delete anything</label>
+          <label class="chip"><input type="checkbox" value="Ask me before anything with force, reset or delete." checked> Ask before force / reset / delete</label>
+        </div>
+      </div>
+      <div class="field"><label for="hbUnclear">Anything unclear? (optional)</label><input type="text" id="hbUnclear" placeholder="e.g. I don't understand fast-forward"></div>
+      <div class="field"><span class="lbl">Level of explanation</span>
+        <div class="chips" id="hbLevel">
+          <label class="chip"><input type="radio" name="hbLevel" value="Please explain briefly."> Brief</label>
+          <label class="chip"><input type="radio" name="hbLevel" value="Please explain as if I'm new to this."> I'm new to this</label>
+          <label class="chip"><input type="radio" name="hbLevel" value="Please give me a step-by-step." checked> Step-by-step</label>
+        </div>
+      </div>
+      <div class="field"><span class="lbl">Finish with</span>
+        <div class="chips" id="hbEnd">
+          <label class="chip"><input type="checkbox" value="Before anything risky, tell me what it will change and whether it can be undone." checked> What will it change? Can it be undone?</label>
+          <label class="chip"><input type="checkbox" value="At the end, summarise what changed and what I need to do next." checked> Summary and next steps</label>
+        </div>
+      </div>
+      <div class="out" id="hbOut"></div>
+      <button class="btn primary" type="button" id="hbCopy">Copy message</button>
+    </div>
+  </div>
+
+  <div class="lesson-foot"><button class="btn" type="button" data-done="help">Mark lesson as done</button><a class="btn primary" href="#project">Next: My project now →</a></div>
+</section>
+
+<!-- ================= TOOL: MAP ================= -->
+<section class="view" data-view="map" id="v-map" hidden>
+  <p class="eyebrow">Tool · Guide part 3</p>
+  <h1>Where do I edit this?</h1>
+  <p class="lede">Pick what you want to change, and see which file to open. Never edit files in <code>public/zh-hk/</code>, <code>public/en/</code>, <code>public/index.html</code> or <code>_preview/</code>: the build creates them.</p>
+
+  <div class="lab">
+    <div class="lab-head"><span class="label">Finder</span><h3>I want to change…</h3></div>
+    <div class="lab-body">
+      <input type="search" id="fdSearch" placeholder="Search, e.g. price, footer, WhatsApp, photo" aria-label="Search what you want to change">
+      <div class="finder" id="fdList"></div>
+      <div class="answer" id="fdAnswer"></div>
+    </div>
+  </div>
+
+  <h2>Folder map</h2>
+  <p>Click any folder or file to see what it holds. The highlighted entry matches your choice in the finder.</p>
+  <div class="legend-badges">
+    <span class="pill accent">Edit here</span><span class="pill bad">Built: never edit</span><span class="pill live">Upload its contents</span><span class="pill warn">Ask for help first</span><span class="pill">Not uploaded</span>
+  </div>
+  <div class="split">
+    <div class="tree" id="tree"></div>
+    <div><div class="answer" id="treeInfo" style="margin-top:0"></div>
+      <p class="small muted" style="margin-top:14px">The project's <code>README.md</code> explains all of this in more detail. It's worth reading once.</p></div>
+  </div>
+</section>
+
+<!-- ================= TOOL: COMMANDS ================= -->
+<section class="view" data-view="commands" id="v-commands" hidden>
+  <p class="eyebrow">Tool · Guide parts 5, 6 and 8</p>
+  <h1>Commands</h1>
+  <p class="lede">Every command and shortcut from the guide in one place. Copy a command, then paste it into the VS Code terminal.</p>
+
+  <h2>Build</h2>
+  <div class="tbl plainfirst">
+    <table>
+      <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><div class="cmd-cell"><code>python3 build.py</code><button class="copy" type="button" data-copy="python3 build.py">Copy</button></div></td><td>Builds the real website into <code>public/</code></td></tr>
+        <tr><td><div class="cmd-cell"><code>python3 build.py --preview</code><button class="copy" type="button" data-copy="python3 build.py --preview">Copy</button></div></td><td>Also builds <code>ready</code> articles, into <code>_preview/</code>. Never upload it.</td></tr>
+        <tr><td><div class="cmd-cell"><code>pip install markdown</code><button class="copy" type="button" data-copy="pip install markdown">Copy</button></div></td><td>Installs the Markdown package the build needs. Run once per Mac.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Git</h2>
+  <div class="tbl plainfirst">
+    <table>
+      <thead><tr><th>Command</th><th>What it does</th><th>Risk</th></tr></thead>
+      <tbody>
+        <tr><td><div class="cmd-cell"><code>git status</code><button class="copy" type="button" data-copy="git status">Copy</button></div></td><td>Shows what changed and which branch you're on. <b>Run it often.</b></td><td><span class="pill ok">None</span></td></tr>
+        <tr><td><div class="cmd-cell"><code>git add &lt;file&gt;</code><button class="copy" type="button" data-copy="git add ">Copy</button></div></td><td>Choose files for the next commit</td><td><span class="pill ok">None</span></td></tr>
+        <tr><td><div class="cmd-cell"><code>git commit -m "message"</code><button class="copy" type="button" data-copy='git commit -m ""'>Copy</button></div></td><td>Save a snapshot with a message</td><td><span class="pill ok">None</span></td></tr>
+        <tr><td><div class="cmd-cell"><code>git push</code><button class="copy" type="button" data-copy="git push">Copy</button></div></td><td>Send commits to GitHub</td><td><span class="pill">Low</span></td></tr>
+        <tr><td><div class="cmd-cell"><code>git pull</code><button class="copy" type="button" data-copy="git pull">Copy</button></div></td><td>Get commits from GitHub</td><td><span class="pill">Low</span></td></tr>
+        <tr><td><div class="cmd-cell"><code>git log --oneline</code><button class="copy" type="button" data-copy="git log --oneline">Copy</button></div></td><td>Show the history, one line per commit</td><td><span class="pill ok">None</span></td></tr>
+        <tr><td><div class="cmd-cell"><code>git switch main</code><button class="copy" type="button" data-copy="git switch main">Copy</button></div></td><td>Switch branch; your files change to match. Older form: <code>git checkout main</code></td><td><span class="pill">Low, if committed first</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="caution"><span class="label">Ask first</span><p>Anything with <code>--force</code>, <code>reset --hard</code> or <code>clean</code>, and deleting a branch that hasn't been merged.</p></div>
+
+  <h2>Shortcuts</h2>
+  <div class="tbl plainfirst">
+    <table>
+      <thead><tr><th>Where</th><th>Keys</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td>VS Code</td><td><kbd>Control</kbd> + <kbd>`</kbd></td><td>Open a new terminal in the project folder</td></tr>
+        <tr><td>Chrome</td><td><kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>R</kbd></td><td>Force a full reload, ignoring the saved copy</td></tr>
+        <tr><td>Safari</td><td><kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>R</kbd></td><td>Force a full reload, ignoring the saved copy</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ================= TOOL: GLOSSARY ================= -->
+<section class="view" data-view="glossary" id="v-glossary" hidden>
+  <p class="eyebrow">Tool · Guide part 10</p>
+  <h1>Glossary</h1>
+  <p class="lede">Every term from the guide, with the Chinese name.</p>
+  <input type="search" id="glSearch" placeholder="Search terms, e.g. branch, cache, 部署" aria-label="Search the glossary" style="margin-top:18px">
+  <div class="tbl plainfirst"><table><thead><tr><th>English</th><th>中文</th><th>Meaning</th></tr></thead><tbody id="glBody"></tbody></table></div>
+  <p class="small muted" id="glCount"></p>
+</section>
+
+<!-- ================= TOOL: QUIZ ================= -->
+<section class="view" data-view="quiz" id="v-quiz" hidden>
+  <p class="eyebrow">Tool · Guide part 11</p>
+  <h1>Revision quiz</h1>
+  <p class="lede">Try each question first, then open the answer.</p>
+  <div id="quizList" style="margin-top:22px"></div>
+</section>
+
+<!-- ================= TOOL: NEXT ================= -->
+<section class="view" data-view="next" id="v-next" hidden>
+  <p class="eyebrow">Tool · Guide part 12</p>
+  <h1>What to learn next</h1>
+  <p class="lede">Free resources, in this order. Then one practice exercise where nothing goes live.</p>
+  <div class="res">
+    <a href="https://developer.mozilla.org/en-US/docs/Learn" target="_blank" rel="noopener"><b>1. HTML and CSS basics</b><span>MDN Learn web development, the "Your first website" section. A few hours.</span></a>
+    <a href="https://skills.github.com" target="_blank" rel="noopener"><b>2. Git and GitHub basics</b><span>GitHub Skills, Introduction to GitHub. Interactive and free.</span></a>
+    <a href="https://git-scm.com/book" target="_blank" rel="noopener"><b>2b. Git in more depth</b><span>Pro Git, chapters 1 to 3.</span></a>
+    <a href="https://code.visualstudio.com/docs/sourcecontrol/overview" target="_blank" rel="noopener"><b>3. Git inside VS Code</b><span>The VS Code Source Control guide.</span></a>
+    <a href="https://www.markdownguide.org/basic-syntax" target="_blank" rel="noopener"><b>4. Markdown</b><span>Markdown Guide, basic syntax.</span></a>
+    <a href="https://developer.mozilla.org/en-US/search?q=how+the+web+works" target="_blank" rel="noopener"><b>5. How the web works</b><span>MDN How the web works: domains, hosting, HTTPS.</span></a>
+    <a href="https://developers.google.com/search/docs/fundamentals/seo-starter-guide" target="_blank" rel="noopener"><b>6. SEO basics</b><span>Google's SEO Starter Guide.</span></a>
+  </div>
+
+  <h2>Practice exercise</h2>
+  <p>About 30 minutes, and nothing goes live. Try it in the <a href="#git">Git playground</a> first if you like. Your ticks are saved in this browser.</p>
+  <label class="check"><input type="checkbox" data-check="px1"><span>Create a branch in VS Code: click the branch name at the bottom left → <i>Create new branch</i>. Name it <code>practice</code>.</span></label>
+  <label class="check"><input type="checkbox" data-check="px2"><span>Change one word in <code>content/zh-hk.json</code>.</span></label>
+  <label class="check"><input type="checkbox" data-check="px3"><span>Run <code>python3 build.py</code> and check the page in your browser.</span></label>
+  <label class="check"><input type="checkbox" data-check="px4"><span>Commit with a clear message, then push.</span></label>
+  <label class="check"><input type="checkbox" data-check="px5"><span>On GitHub, open a pull request from <code>practice</code> into <code>main</code>. Look at the <b>Files changed</b> tab, then close the pull request <b>without merging</b>.</span></label>
+  <label class="check"><input type="checkbox" data-check="px6"><span>Switch back to main (<code>git switch main</code>). Your word change disappears from the folder. That's expected: it lives on the <code>practice</code> branch.</span></label>
+  <p style="margin-top:16px">Once that cycle feels normal, you understand most of what you need day to day.</p>
+</section>
+
+<!-- ================= TOOL: PROJECT ================= -->
+<section class="view" data-view="project" id="v-project" hidden>
+  <p class="eyebrow">Tool · Guide parts 6, 7 and 8</p>
+  <h1>My project now</h1>
+  <p class="lede">Notes about where the SenseCellar project stood on 22 Oct 2026. These change over time, so they live here instead of in the lessons.</p>
+
+  <h2>Git status</h2>
+  <div class="split">
+    <div class="card"><span class="pill ok">Up to date</span><h4 style="margin-top:10px">main</h4><p>main on GitHub and on your Mac has all the work. Pull request #1 was merged.</p></div>
+    <div class="card"><span class="pill warn">Can be deleted</span><h4 style="margin-top:10px">guides-20-articles</h4><p>This branch is finished. All its work is in main, so it's safe to delete.</p></div>
+  </div>
+
+  <h2>Still to do before launch</h2>
+  <p class="muted">From the README. Your ticks are saved in this browser.</p>
+  <label class="check"><input type="checkbox" data-check="todo1"><span>App Store / Google Play links and the real QR code (<code>templates/app.html</code>, <code>public/assets/img/app-qr.png</code>)</span></label>
+  <label class="check"><input type="checkbox" data-check="todo2"><span>Modulo I price, deposit and payment methods</span></label>
+  <label class="check"><input type="checkbox" data-check="todo3"><span>Real social media links in <code>data/site.json</code> (currently <code>#</code>)</span></label>
+  <label class="check"><input type="checkbox" data-check="todo4"><span>Website domain (<code>url</code> in <code>data/site.json</code>)</span></label>
+
+  <h2>The "app 2.html" copies</h2>
+  <p>Your project is inside <code>Documents</code>, which iCloud syncs. When many files change at once (a <code>git pull</code>, switching branch, a full rebuild), iCloud sometimes saves a second copy named <code>… 2.html</code> instead of replacing the file. On 22 Oct we found and deleted 48 such copies. All were exact duplicates.</p>
+  <div class="split">
+    <div class="card"><h4>The fix</h4><p>Move the project out of iCloud, e.g. to a <code>Projects</code> folder in your home folder. GitHub is already your backup. After moving, reopen the folder in VS Code.</p></div>
+    <div class="card"><h4>Until then</h4><p>After a pull or rebuild, run <code>git status</code> and look for files ending in <code> 2</code>. If one is identical to the original, delete it. If it's different, ask first.</p></div>
+  </div>
+  <label class="check" style="margin-top:12px"><input type="checkbox" data-check="icloud"><span>Project moved out of iCloud</span></label>
+
+  <h2>Your Mac setup</h2>
+  <div class="tbl plainfirst">
+    <table>
+      <tbody>
+        <tr><td><b>Python 3</b></td><td>Already installed. The build needs it.</td></tr>
+        <tr><td><b>Markdown package</b></td><td><code>pip install markdown</code>, run once.</td></tr>
+        <tr><td><b>.DS_Store files</b></td><td>Hidden macOS folder settings. They're harmless, and Git ignores them.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('swl:' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('swl:' + k, JSON.stringify(v)); } catch(e){} }
+};
+function flash(el){ if(!el) return; el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+function say(el, html, tone, label){
+  el.hidden = false;
+  el.className = 'say' + (tone && tone !== 'info' ? ' ' + tone : '');
+  el.innerHTML = (label ? '<span class="label">' + label + '</span>' : '') + html;
+}
+
+/* =========================================================
+   Router + progress
+   ========================================================= */
+const views = $$('.view');
+const names = views.map(v => v.dataset.view);
+const rail = $('#rail'), railToggle = $('#railToggle');
+function show(name, scroll){
+  if (!names.includes(name)) name = 'start';
+  views.forEach(v => { v.hidden = v.dataset.view !== name; });
+  $$('.nav a').forEach(a => a.classList.toggle('current', a.getAttribute('href') === '#' + name));
+  rail.classList.remove('open'); railToggle.setAttribute('aria-expanded', 'false');
+  if (scroll !== false) window.scrollTo(0, 0);
+  store.set('view', name);
+}
+document.addEventListener('click', e => {
+  const a = e.target.closest('a[href^="#"]');
+  if (!a || a.closest('.layer-host')) return;
+  const name = a.getAttribute('href').slice(1);
+  if (!names.includes(name)) return;
+  e.preventDefault();
+  show(name);
+  try { history.replaceState(null, '', '#' + name); } catch(err){}
+});
+window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+railToggle.addEventListener('click', () => {
+  const open = !rail.classList.contains('open');
+  rail.classList.toggle('open', open);
+  railToggle.setAttribute('aria-expanded', String(open));
+});
+
+const LESSONS = ['places','build','files','check','git','publish','help'];
+const done = new Set(store.get('done', []));
+function renderProgress(){
+  $$('.nav a[data-lesson]').forEach((a, i) => {
+    const d = done.has(a.dataset.lesson);
+    a.classList.toggle('done', d);
+    $('.num', a).textContent = d ? '✓' : String(i + 1);
+  });
+  const n = LESSONS.filter(l => done.has(l)).length;
+  $('#progText').textContent = n + ' of 7 lessons done';
+  $('#progBar').style.width = (n / 7 * 100) + '%';
+  $$('[data-done]').forEach(b => {
+    const d = done.has(b.dataset.done);
+    b.textContent = d ? 'Done ✓  (click to undo)' : 'Mark lesson as done';
+    b.classList.toggle('is-done', d);
+    b.setAttribute('aria-pressed', String(d));
+  });
+  $$('[data-status]').forEach(s => {
+    const d = done.has(s.dataset.status);
+    s.textContent = d ? 'Done' : 'To do';
+    s.className = 'pill ' + (d ? 'ok' : 'muted');
+  });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-done]');
+  if (!b) return;
+  const k = b.dataset.done;
+  if (done.has(k)) done.delete(k); else done.add(k);
+  store.set('done', Array.from(done));
+  renderProgress();
+});
+
+/* Copy buttons */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-copy]');
+  if (!b) return;
+  copyText(b.dataset.copy, b);
+});
+function copyText(text, btn){
+  const old = btn.textContent;
+  const ok = () => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = old; }, 1400); };
+  const fail = () => {
+    btn.textContent = 'Select and copy';
+    const code = btn.parentElement && btn.parentElement.querySelector('code');
+    if (code){ const r = document.createRange(); r.selectNodeContents(code); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+    setTimeout(() => { btn.textContent = old; }, 2000);
+  };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(ok, fail);
+    else fail();
+  } catch(err){ fail(); }
+}
+
+/* Persisted checklists */
+const checks = store.get('checks', {});
+$$('[data-check]').forEach(cb => {
+  cb.checked = !!checks[cb.dataset.check];
+  cb.addEventListener('change', () => { checks[cb.dataset.check] = cb.checked; store.set('checks', checks); });
+});
+
+/* Simple tab groups */
+function tabGroup(tabsSel, attr, panelAttr, onChange){
+  const tabs = $$(tabsSel + ' [data-' + attr + ']');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === t)));
+    const key = t.dataset[attr];
+    if (panelAttr) $$('[data-' + panelAttr + ']').forEach(p => { p.hidden = p.dataset[panelAttr.replace(/-([a-z])/g, (m, c) => c.toUpperCase())] !== key; });
+    if (onChange) onChange(key);
+  }));
+}
+tabGroup('#wayTabs', 'way', 'wayp');
+
+/* =========================================================
+   Lesson 1: three places
+   ========================================================= */
+const HOURS = ['Mon–Sat 11:00–20:00', 'Mon–Sun 10:00–21:00', 'Daily 12:00–22:00'];
+let P = null;
+function pReset(){
+  P = { src:0, built:0, cSrc:0, cBuilt:0, ahead:0, gSrc:0, gBuilt:0, live:0,
+        msg:'Start with <b>Edit the hours</b>. After each click, look at which box changes.', tone:'info' };
+  pRender(null);
+}
+function pAct(a){
+  if (a === 'reset') return pReset();
+  const prev = Object.assign({}, P);
+  if (a === 'edit'){
+    P.src = (P.src + 1) % HOURS.length;
+    P.msg = 'You changed the hours in <code>content/en.json</code> to <b>' + HOURS[P.src] + '</b>. Only the source file on your Mac changed. The built pages, GitHub and the live site still have the old hours.';
+    P.tone = 'info';
+  }
+  if (a === 'build'){
+    if (P.built === P.src){ P.msg = 'Built. <code>public/</code> already matched the source, so nothing changed.'; P.tone = 'info'; }
+    else { P.built = P.src; P.msg = '<code>python3 build.py</code> copied the new hours into every page in <code>public/</code> on your Mac. You could check it in your browser now. GitHub and the live site have not changed.'; P.tone = 'ok'; }
+  }
+  if (a === 'commit'){
+    if (P.src === P.cSrc && P.built === P.cBuilt){ P.msg = 'Nothing to commit. There are no changes since your last snapshot.'; P.tone = 'warn'; }
+    else {
+      P.cSrc = P.src; P.cBuilt = P.built; P.ahead++;
+      P.msg = 'Saved a snapshot on your Mac. GitHub doesn\'t have it yet: <code>ahead ' + P.ahead + '</code> means your Mac has ' + P.ahead + ' commit' + (P.ahead > 1 ? 's' : '') + ' that GitHub doesn\'t.';
+      P.tone = 'ok';
+      if (P.built !== P.src){ P.msg += ' <b>Careful:</b> you committed before building, so this snapshot\'s <code>public/</code> still has the old hours. Build, then commit again.'; P.tone = 'warn'; }
+    }
+  }
+  if (a === 'push'){
+    if (!P.ahead){ P.msg = 'Nothing to push. Push only sends commits, so commit first.'; P.tone = 'warn'; }
+    else { P.gSrc = P.cSrc; P.gBuilt = P.cBuilt; P.ahead = 0; P.msg = 'Your commits are on GitHub, so the work is backed up. <b>The live site has not changed.</b> GitHub and the web host are not connected.'; P.tone = 'ok'; }
+  }
+  if (a === 'upload'){
+    if (P.live === P.built){
+      P.msg = P.built === P.src
+        ? 'Uploaded, but <code>public/</code> is the same as what is already live, so visitors see no change.'
+        : 'Uploaded, but nothing changed for visitors: <code>public/</code> hasn\'t been rebuilt since you edited. Build first, then upload.';
+      P.tone = 'warn';
+    } else {
+      P.live = P.built;
+      P.msg = 'You uploaded the contents of <code>public/</code> to the web host. Visitors now see <b>' + HOURS[P.live] + '</b>.';
+      P.tone = 'ok';
+      if (P.built !== P.src) P.msg += ' Your source file has a newer edit that isn\'t built yet.';
+    }
+  }
+  pRender(prev);
+}
+function pRender(prev){
+  const outdated = P.built !== P.src;
+  const uncommitted = P.src !== P.cSrc || P.built !== P.cBuilt;
+  $('#psSrc').textContent = HOURS[P.src];
+  $('#psBuilt').innerHTML = esc(HOURS[P.built]) + (outdated ? '<span class="pill warn">out of date</span>' : '');
+  $('#psStatus').innerHTML = uncommitted ? '<span class="pill warn">not committed</span>' : P.ahead ? '<span class="pill gh">ahead ' + P.ahead + '</span>' : '<span class="pill ok">matches GitHub</span>';
+  $('#psGSrc').textContent = HOURS[P.gSrc];
+  $('#psGBuilt').textContent = HOURS[P.gBuilt];
+  $('#psLive').textContent = HOURS[P.live];
+  say($('#psSay'), P.msg, P.tone, 'What just happened');
+  if (prev){
+    if (prev.src !== P.src) flash($('#psSrcBox'));
+    if (prev.built !== P.built) flash($('#psBuiltBox'));
+    if (prev.gSrc !== P.gSrc) flash($('#psGSrcBox'));
+    if (prev.gBuilt !== P.gBuilt) flash($('#psGBuiltBox'));
+    if (prev.live !== P.live) flash($('#psLiveBox'));
+  }
+  const goal = P.src !== 0 && P.built === P.src && P.live === P.src && P.gSrc === P.src && P.gBuilt === P.src;
+  $('#psWin').hidden = !goal;
+}
+$('#placesLab').addEventListener('click', e => { const b = e.target.closest('[data-p]'); if (b) pAct(b.dataset.p); });
+pReset();
+
+/* =========================================================
+   JSON checker (shared by lesson 2 and lesson 3)
+   ========================================================= */
+function firstCol(line){ const m = line.match(/\S/); return m ? m.index + 1 : 1; }
+function nextNonEmpty(lines, i){ for (let j = i + 1; j < lines.length; j++) if (lines[j].trim()) return j; return -1; }
+function checkJSON(text){
+  try { JSON.parse(text); return { ok:true }; } catch(e){ /* diagnose below */ }
+  const lines = text.split('\n');
+  // 1. curly quotes
+  for (let i = 0; i < lines.length; i++){
+    const idx = lines[i].search(/[“”‘’]/);
+    if (idx >= 0){
+      const beforeColon = lines[i].indexOf(':') === -1 || idx < lines[i].indexOf(':');
+      return { ok:false, line:i + 1, title:'Curly quotes',
+        msg:'Line ' + (i + 1) + ' uses curly quotes “ ”. JSON needs straight double quotes " ". This often happens when text is pasted from Word or a phone.',
+        py:(beforeColon ? 'Expecting property name enclosed in double quotes' : 'Expecting value') + ': line ' + (i + 1) + ' column ' + (idx + 1) };
+    }
+  }
+  // 2. quote inside text
+  for (let i = 0; i < lines.length; i++){
+    const m = lines[i].match(/^\s*"[^"]*"\s*:\s*"(.*)"\s*,?\s*$/);
+    if (m && /(^|[^\\])"/.test(m[1])){
+      const col = lines[i].indexOf('"', lines[i].indexOf(':') + 2 + m[1].search(/(^|[^\\])"/)) + 1;
+      return { ok:false, line:i + 1, title:'A double quote inside the text',
+        msg:'Line ' + (i + 1) + ' has an extra " inside the text, so JSON thinks the text ends early. Write it as \\" (backslash, then quote), or use Chinese quotes 「」.',
+        py:'Expecting \',\' delimiter: line ' + (i + 1) + ' column ' + Math.max(col, 1) };
+    }
+  }
+  // 3. trailing comma
+  for (let i = 0; i < lines.length; i++){
+    const same = lines[i].search(/,\s*[}\]]/);
+    if (same >= 0) return { ok:false, line:i + 1, title:'Extra comma after the last item',
+      msg:'Remove the comma before the closing bracket on line ' + (i + 1) + '. The last item in a group has no comma after it.',
+      py:'Expecting property name enclosed in double quotes: line ' + (i + 1) + ' column ' + (same + 2) };
+    if (/,\s*$/.test(lines[i])){
+      const j = nextNonEmpty(lines, i);
+      if (j >= 0 && /^\s*[}\]]/.test(lines[j])) return { ok:false, line:i + 1, title:'Extra comma after the last item',
+        msg:'Remove the comma at the end of line ' + (i + 1) + '. The last item in a group has no comma after it.',
+        py:'Expecting property name enclosed in double quotes: line ' + (j + 1) + ' column ' + firstCol(lines[j]) };
+    }
+  }
+  // 4. missing comma
+  for (let i = 0; i < lines.length; i++){
+    const t = lines[i].trimEnd();
+    if (/("|\d|true|false|null|\}|\])$/.test(t) && !/^\s*[\[{]\s*$/.test(t)){
+      const j = nextNonEmpty(lines, i);
+      if (j >= 0 && /^\s*"/.test(lines[j])) return { ok:false, line:i + 1, title:'Missing comma',
+        msg:'Add a comma at the end of line ' + (i + 1) + '. Items in a group must be separated by commas. Python reports it on line ' + (j + 1) + ', where it expected the comma.',
+        py:'Expecting \',\' delimiter: line ' + (j + 1) + ' column ' + firstCol(lines[j]) };
+    }
+  }
+  // 5. brackets
+  let o = 0, c = 0, so = 0, sc = 0, inStr = false;
+  for (let k = 0; k < text.length; k++){
+    const ch = text[k];
+    if (ch === '"' && text[k - 1] !== '\\') inStr = !inStr;
+    if (inStr) continue;
+    if (ch === '{') o++; if (ch === '}') c++; if (ch === '[') so++; if (ch === ']') sc++;
+  }
+  if (o !== c || so !== sc){
+    const missing = o > c ? 'a closing }' : c > o ? 'an opening {' : so > sc ? 'a closing ]' : 'an opening [';
+    return { ok:false, line: o > c || so > sc ? lines.length : null, title:'A bracket is missing',
+      msg:'Every { needs a matching } and every [ a matching ]. This file has ' + o + ' { and ' + c + ' }. It looks like ' + missing + ' is missing.',
+      py: o > c || so > sc ? 'Expecting \',\' delimiter: line ' + lines.length + ' column ' + (lines[lines.length - 1].length + 1) : 'Extra data: line ' + lines.length + ' column 1' };
+  }
+  let msg = 'Something in this file is not valid JSON.';
+  try { JSON.parse(text); } catch(e){ msg += ' The browser says: ' + e.message; }
+  return { ok:false, line:null, title:'Not valid JSON', msg:msg, py:'Expecting value' };
+}
+
+/* =========================================================
+   Lesson 2: build simulator
+   ========================================================= */
+const BS_DEFAULT = {
+  'content/en.json': '{\n  "home": { "title": "Wine storage in Hong Kong" },\n  "club": { "title": "Join the wine club" },\n  "contact": { "title": "Visit the cellar" },\n  "footer": {\n    "hours": "Mon–Sat 11:00–20:00",\n    "copy": "© 2026 SenseCellar"\n  }\n}',
+  'data/site.json': '{\n  "whatsapp": "+852 9108 9724",\n  "social": { "instagram": "#" }\n}',
+  'partials/_footer.html': '<footer>\n  <p>Opening hours: {{footer.hours}}</p>\n  <p>WhatsApp: {{site.whatsapp}}</p>\n  <p>{{footer.copy}}</p>\n</footer>',
+  'templates/index.html': '<h1>{{home.title}}</h1>\n<p>Example home page.</p>\n{{>_footer}}',
+  'templates/club.html': '<h1>{{club.title}}</h1>\n<p>Example club page.</p>\n{{>_footer}}',
+  'templates/contact.html': '<h1>{{contact.title}}</h1>\n<p>Example contact page.</p>\n{{>_footer}}'
+};
+const BS_TEMPLATES = ['templates/index.html', 'templates/club.html', 'templates/contact.html'];
+let bsFiles, bsActive = 'content/en.json', bsPages = {}, bsLastHours = '';
+function lookup(obj, path){ return path.split('.').reduce((o, k) => (o && typeof o === 'object' && k in o) ? o[k] : undefined, obj); }
+function runBuild(files){
+  let content, site;
+  for (const f of ['content/en.json', 'data/site.json']){
+    try { const v = JSON.parse(files[f]); if (f === 'content/en.json') content = v; else site = v; }
+    catch(e){
+      const r = checkJSON(files[f]);
+      return { ok:false, kind:'json', file:f, info:r,
+        text:'<span class="t-dim">$ python3 build.py</span>\nTraceback (most recent call last):\n  File "build.py", line …, in load_json\n    return json.load(f)\n<span class="t-err">json.decoder.JSONDecodeError: ' + esc(r.py || 'Expecting value') + '</span>' };
+    }
+  }
+  const missing = new Map();
+  const add = (ph, file, page) => {
+    const k = ph + '|' + file;
+    if (!missing.has(k)) missing.set(k, { ph:ph, file:file, pages:[] });
+    const m = missing.get(k); if (!m.pages.includes(page)) m.pages.push(page);
+  };
+  const fill = (text, file, page, depth) => text.replace(/\{\{\s*([>@]?)\s*([\w.\-]+)\s*\}\}/g, (m, kind, key) => {
+    if (kind === '>'){
+      const pf = 'partials/' + key + '.html';
+      if (files[pf] == null || depth > 3){ add(m, file, page); return m; }
+      return fill(files[pf], pf, page, depth + 1);
+    }
+    if (kind === '@'){ add(m, file, page); return m; }
+    const val = key.indexOf('site.') === 0 ? lookup(site, key.slice(5)) : lookup(content, key);
+    if (val == null || typeof val === 'object'){ add(m, file, page); return m; }
+    return String(val);
+  });
+  const pages = {};
+  BS_TEMPLATES.forEach(t => {
+    const page = 'en/' + t.split('/')[1];
+    const body = fill(files[t], t, page, 0);
+    pages[page] = { body:body, html:'<!doctype html>\n<!-- Built by build.py from ' + t + ' and content/en.json. Do not edit this file: the next build replaces it. -->\n' + body, hand:false };
+  });
+  if (missing.size){
+    const lines = Array.from(missing.values()).map(m => '  - ' + esc(m.ph) + ' is not filled in (' + esc(m.file) + ') on ' + m.pages.length + ' page' + (m.pages.length > 1 ? 's' : '') + ', e.g. ' + esc(m.pages[m.pages.length - 1]));
+    return { ok:false, kind:'missing', items:Array.from(missing.values()),
+      text:'<span class="t-dim">$ python3 build.py</span>\n<span class="t-err">build failed; public/ was not changed.</span> Fix:\n' + lines.join('\n') };
+  }
+  return { ok:true, pages:pages, hours:lookup(content, 'footer.hours'),
+    text:'<span class="t-dim">$ python3 build.py</span>\n' + Object.keys(pages).map(p => '<span class="t-ok">built</span> ' + p).join('\n') };
+}
+function cleanHTML(s){ return s.replace(/<script[\s\S]*?<\/script>/gi, '').replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '').replace(/<!doctype[^>]*>/i, '').replace(/<!--[\s\S]*?-->/g, ''); }
+function bsRenderTabs(){
+  $('#bsTabs').innerHTML = Object.keys(bsFiles).map(f => '<button class="tab" type="button" role="tab" aria-selected="' + (f === bsActive) + '" data-f="' + esc(f) + '">' + esc(f) + '</button>').join('');
+  $('#bsEditor').value = bsFiles[bsActive];
+}
+function bsRenderPages(changed){
+  $('#bsPages').innerHTML = Object.keys(bsPages).map(p => {
+    const pg = bsPages[p];
+    return '<div class="bpage" data-page="' + esc(p) + '"><div class="bpage-bar"><span>public/' + esc(p) + '</span>' + (pg.hand ? '<span class="pill warn">edited by hand</span>' : '<span class="pill">built</span>') + '</div>' +
+      '<div class="bpage-view">' + cleanHTML(pg.html) + '</div>' +
+      '<div class="bpage-actions"><button class="btn sm" type="button" data-bs="src">' + (pg.open ? 'Hide the file' : 'Show the file') + '</button><button class="btn sm" type="button" data-bs="hand">Edit this built copy</button></div>' +
+      (pg.open ? '<pre>' + esc(pg.html) + '</pre>' : '') + '</div>';
+  }).join('');
+  (changed || []).forEach(p => flash($('.bpage[data-page="' + p + '"]')));
+}
+function bsReset(){
+  bsFiles = Object.assign({}, BS_DEFAULT); bsActive = 'content/en.json';
+  const r = runBuild(bsFiles); bsPages = r.pages; bsLastHours = r.hours;
+  bsRenderTabs(); bsRenderPages();
+  $('#bsTerm').innerHTML = r.text; $('#bsTermState').innerHTML = '<span class="t-ok">last build OK</span>';
+  $('#bsSay').hidden = true;
+}
+$('#bsTabs').addEventListener('click', e => { const t = e.target.closest('[data-f]'); if (!t) return; bsActive = t.dataset.f; bsRenderTabs(); });
+$('#bsEditor').addEventListener('input', e => { bsFiles[bsActive] = e.target.value; });
+$('#bsReset').addEventListener('click', bsReset);
+$('#bsBuild').addEventListener('click', () => {
+  const r = runBuild(bsFiles);
+  $('#bsTerm').innerHTML = r.text;
+  const sayEl = $('#bsSay');
+  if (r.ok){
+    const handed = Object.keys(bsPages).filter(p => bsPages[p].hand);
+    const changed = Object.keys(r.pages).filter(p => !bsPages[p] || bsPages[p].html !== r.pages[p].html);
+    Object.keys(r.pages).forEach(p => { r.pages[p].open = bsPages[p] && bsPages[p].open; });
+    bsPages = r.pages; bsLastHours = r.hours;
+    bsRenderPages(changed);
+    $('#bsTermState').innerHTML = '<span class="t-ok">build OK</span>';
+    if (handed.length) say(sayEl, 'Your hand edit to <code>public/' + handed[0] + '</code> is gone. The build rewrites every page from the source files. To make a lasting change, edit the source file instead.', 'warn', 'The build replaced your edit');
+    else if (changed.length) say(sayEl, changed.length + ' page' + (changed.length > 1 ? 's' : '') + ' changed: ' + changed.map(p => '<code>' + p + '</code>').join(', ') + '. One edit to a source file updated every page that uses it.', 'ok', 'Build finished');
+    else say(sayEl, 'Every page is the same as before, because nothing that the pages use has changed.', 'info', 'Build finished');
+  } else if (r.kind === 'missing'){
+    const m = r.items[0];
+    $('#bsTermState').innerHTML = '<span class="t-err">build failed</span>';
+    say(sayEl, '<b>What:</b> ' + esc(m.ph) + ' has no value. <b>Where:</b> <code>' + esc(m.file) + '</code>. <b>How widespread:</b> ' + m.pages.length + ' page' + (m.pages.length > 1 ? 's' : '') + '. The pages on the right still show the last good build, because the build stopped before changing anything.', 'bad', 'Read the error');
+  } else {
+    $('#bsTermState').innerHTML = '<span class="t-err">error</span>';
+    say(sayEl, '<code>' + esc(r.file) + '</code>: ' + esc(r.info.msg) + ' Read the last line of the error first: it names the problem and the line to look at.', 'bad', esc(r.info.title));
+  }
+});
+$('#bsPages').addEventListener('click', e => {
+  const b = e.target.closest('[data-bs]'); if (!b) return;
+  const p = b.closest('.bpage').dataset.page, pg = bsPages[p];
+  if (b.dataset.bs === 'src'){ pg.open = !pg.open; bsRenderPages(); return; }
+  const handText = 'Open every day 09:00–23:00 (edited by hand)';
+  if (bsLastHours && pg.html.indexOf(bsLastHours) >= 0 && !pg.hand) pg.html = pg.html.split(bsLastHours).join(handText);
+  else if (!pg.hand) pg.html = pg.html.replace('</footer>', '  <p>' + handText + '</p>\n</footer>');
+  pg.hand = true;
+  bsRenderPages([p]);
+  say($('#bsSay'), 'You edited <code>public/' + p + '</code> directly. It looks fine for now. Click <b>Build</b> and watch what happens to it.', 'warn', 'You edited a built file');
+});
+bsReset();
+
+/* =========================================================
+   Lesson 3: layers, JSON playground, Markdown
+   ========================================================= */
+const L_HTML = '<div class="site">\n  <header>\n    <strong class="logo">SenseCellar</strong>\n    <button class="menu-btn" type="button">Menu</button>\n  </header>\n  <nav class="menu">\n    <a href="#">Home</a>\n    <a href="#">Storage plans</a>\n    <a href="#">Wine club</a>\n    <a href="#">Contact</a>\n  </nav>\n  <main>\n    <h1>Your wine, kept at the right temperature</h1>\n    <p>Private wine storage in Hong Kong.</p>\n    <a class="cta" href="#">Book a visit</a>\n  </main>\n</div>';
+const L_CSS = '.site { font-family: system-ui, sans-serif; color: #2a2026;\n  background: #fbf7f8; border-radius: 10px; overflow: hidden; }\nheader { display: flex; justify-content: space-between;\n  align-items: center; padding: 14px 18px;\n  background: #5b1530; color: #fff; }\n.logo { letter-spacing: .06em; }\n.menu-btn { background: transparent; color: #fff;\n  border: 1px solid rgba(255,255,255,.6); border-radius: 6px;\n  padding: 6px 12px; font: inherit; cursor: pointer; }\n.menu { display: none; flex-direction: column;\n  background: #3f0f22; padding: 4px 18px; }\n.menu.open { display: flex; }\n.menu a { color: #fff; padding: 8px 0; text-decoration: none;\n  border-bottom: 1px solid rgba(255,255,255,.12); }\nmain { padding: 22px 18px 26px; }\nh1 { font-size: 22px; line-height: 1.2; margin: 0 0 10px; }\np { margin: 0 0 16px; color: #5a4b53; }\n.cta { display: inline-block; background: #5b1530; color: #fff;\n  padding: 10px 16px; border-radius: 8px;\n  text-decoration: none; font-weight: 600; }';
+const L_JS = "const button = document.querySelector('.menu-btn');\nconst menu = document.querySelector('.menu');\n\nbutton.addEventListener('click', () => {\n  menu.classList.toggle('open');\n});";
+const lyHost = $('#lyHost');
+const lyRoot = lyHost.attachShadow ? lyHost.attachShadow({ mode:'open' }) : null;
+let lyTab = 'html';
+function lyRender(){
+  const cssOn = $('#lyCss').checked, jsOn = $('#lyJs').checked;
+  if (lyRoot){
+    lyRoot.innerHTML = '<style>:host{all:initial;display:block;background:#fff;color:#000;font-family:Times,"Times New Roman",serif;font-size:16px;padding:12px;min-height:240px}' + (cssOn ? L_CSS : '') + '</style>' + L_HTML;
+    lyRoot.querySelector('.menu-btn').addEventListener('click', () => {
+      const menu = lyRoot.querySelector('.menu');
+      if (!jsOn){ say($('#lySay'), 'You clicked <b>Menu</b> and nothing happened. Without JavaScript, the button can\'t respond.', 'warn'); return; }
+      menu.classList.toggle('open');
+      if (!cssOn) say($('#lySay'), 'JavaScript added the class <code>open</code>, but you can\'t see a difference: without CSS there\'s no rule that hides or shows the menu, so the links always show.', 'info');
+      else say($('#lySay'), menu.classList.contains('open') ? 'JavaScript responded to the click and opened the menu. CSS decides how it looks.' : 'Closed again. That\'s JavaScript responding to each click.', 'ok');
+    });
+    lyRoot.addEventListener('click', e => { if (e.target.closest('a')) e.preventDefault(); });
+  }
+  const code = { html:L_HTML, css:L_CSS, js:L_JS }[lyTab];
+  $('#lyCode').textContent = code;
+}
+$('#lyCss').addEventListener('change', () => { lyRender(); say($('#lySay'), $('#lyCss').checked ? 'CSS is back: colours, spacing and the hidden menu.' : 'Without CSS the page keeps all its content, but it looks like a plain document: default font, no colours, and the menu links always show.', 'info'); });
+$('#lyJs').addEventListener('change', () => { lyRender(); say($('#lySay'), $('#lyJs').checked ? 'JavaScript is on. Click Menu.' : 'JavaScript is off. The page looks the same. Now click Menu.', 'info'); });
+tabGroup('#lyTabs', 'ly', null, k => { lyTab = k; lyRender(); });
+lyRender();
+
+const JS_EX = {
+  comma: '{\n  "footer": {\n    "h_contact": "聯絡我們"\n    "copy": "© 2026 SenseCellar"\n  }\n}',
+  extra: '{\n  "footer": {\n    "h_contact": "聯絡我們",\n    "copy": "© 2026 SenseCellar",\n  }\n}',
+  curly: '{\n  "footer": {\n    "h_contact": "聯絡我們",\n    "copy": “© 2026 SenseCellar”\n  }\n}',
+  quote: '{\n  "footer": {\n    "h_contact": "聯絡我們",\n    "copy": "The "best" cellar in town"\n  }\n}',
+  brace: '{\n  "footer": {\n    "h_contact": "聯絡我們",\n    "copy": "© 2026 SenseCellar"\n  }',
+  ok: '{\n  "footer": {\n    "h_contact": "聯絡我們",\n    "copy": "© 2026 SenseCellar"\n  }\n}'
+};
+const jsEd = $('#jsEditor'), jsGut = $('#jsGutter');
+function jsCheck(){
+  const text = jsEd.value, r = checkJSON(text);
+  const n = text.split('\n').length;
+  let g = '';
+  for (let i = 1; i <= n; i++) g += '<div' + (!r.ok && r.line === i ? ' class="err"' : '') + '>' + i + '</div>';
+  jsGut.innerHTML = g;
+  jsGut.scrollTop = jsEd.scrollTop;
+  if (r.ok) say($('#jsSay'), 'This is valid JSON. The build can read it.', 'ok', 'No problems');
+  else say($('#jsSay'), esc(r.msg) + '<br><span class="small muted">The build would report: <code>JSONDecodeError: ' + esc(r.py) + '</code></span>', 'bad', esc(r.title) + (r.line ? ' · line ' + r.line : ''));
+}
+jsEd.addEventListener('input', jsCheck);
+jsEd.addEventListener('scroll', () => { jsGut.scrollTop = jsEd.scrollTop; });
+$('#jsExamples').addEventListener('click', e => { const b = e.target.closest('[data-ex]'); if (!b) return; jsEd.value = JS_EX[b.dataset.ex]; jsCheck(); });
+jsEd.value = JS_EX.comma; jsCheck();
+
+const MD_SAMPLE = '## A small heading\n\nA normal paragraph. **This part is bold.**\n\n- First list item\n- Second list item\n\n[Link text](https://example.com)\n\n![Image description](guides/guide-wine-cork-close-up.jpg "Caption shown under the photo")\n\n[[climate]]\n\n## 關於 SenseCellar\n\nEvery article ends with this section.';
+function mdInline(s){
+  let out = esc(s);
+  out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m, t, u) => /^(https?:|#|\/|[\w\-./]+$)/i.test(u.replace(/&amp;/g, '&')) && !/^javascript:/i.test(u) ? '<a href="' + u + '" target="_blank" rel="noopener">' + t + '</a>' : t);
+  return out;
+}
+function md(src){
+  const out = []; let para = [], list = null;
+  const fp = () => { if (para.length){ out.push('<p>' + mdInline(para.join(' ')) + '</p>'); para = []; } };
+  const fl = () => { if (list){ out.push('<ul>' + list.map(i => '<li>' + mdInline(i) + '</li>').join('') + '</ul>'); list = null; } };
+  const info = { images:0, charts:0, lastHeading:null };
+  src.split('\n').forEach(raw => {
+    const line = raw.trim(); let m;
+    if (!line){ fp(); fl(); return; }
+    if ((m = line.match(/^(#{1,4})\s+(.*)$/))){ fp(); fl(); const lv = m[1].length + 1; out.push('<h' + Math.min(lv, 4) + '>' + mdInline(m[2]) + '</h' + Math.min(lv, 4) + '>'); info.lastHeading = m[2].trim(); return; }
+    if ((m = line.match(/^[-*]\s+(.*)$/))){ fp(); if (!list) list = []; list.push(m[1]); return; }
+    if (line === '[[climate]]'){ fp(); fl(); info.charts++; out.push('<div class="md-chart">Hong Kong climate chart<small>The build inserts the chart here</small></div>'); return; }
+    if ((m = line.match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)$/))){ fp(); fl(); info.images++; out.push('<figure class="md-fig"><div class="md-img">photo: ' + esc(m[2]) + '</div><figcaption>' + esc(m[3] || m[1]) + '</figcaption></figure>'); return; }
+    fl(); para.push(line);
+  });
+  fp(); fl();
+  return { html:out.join(''), info:info };
+}
+function mdRender(){
+  const r = md($('#mdEditor').value);
+  $('#mdOut').innerHTML = r.html || '<p class="muted">Type some Markdown on the left.</p>';
+  const endsOk = r.info.lastHeading === '關於 SenseCellar';
+  $('#mdChecks').innerHTML =
+    '<li><span class="pill ' + (endsOk ? 'ok">OK' : 'warn">Fix') + '</span><span>' + (endsOk ? 'Ends with the required section <code>## 關於 SenseCellar</code>.' : 'Every article must end with the section <code>## 關於 SenseCellar</code>. Add it as the last heading.') + '</span></li>' +
+    '<li><span class="pill">' + r.info.images + '</span><span>photo' + (r.info.images === 1 ? '' : 's') + ' with captions</span></li>' +
+    '<li><span class="pill">' + r.info.charts + '</span><span>climate chart' + (r.info.charts === 1 ? '' : 's') + ' (<code>[[climate]]</code>)</span></li>';
+}
+$('#mdEditor').value = MD_SAMPLE;
+$('#mdEditor').addEventListener('input', mdRender);
+mdRender();
+
+/* =========================================================
+   Lesson 4: decoder + troubleshooter
+   ========================================================= */
+const DC = {
+  ok1: ['Success', 'Each <code>built …</code> line is one finished page. If you see this list and no "build failed", the build worked. Now double-click <code>public/index.html</code> to check the result in your browser.'],
+  f0: ['Nothing broken went out', 'The build found a problem and stopped <b>before changing anything</b>. Your <code>public/</code> folder still holds the last good version, so there\'s no rush.'],
+  f1: ['What is wrong', '<code>{{footer.hourz}}</code> has no value. There is no key called <code>hourz</code> under <code>footer</code> in the content files. Usually this is a typo.'],
+  f2: ['Where to fix it', 'Open <code>partials/_footer.html</code>. That\'s the file with the bad placeholder. Don\'t touch anything in <code>public/</code>.'],
+  f3: ['How widespread', 'Every page uses the footer, so 35 pages are affected. One fix in the partial repairs all of them. <code>en/app.html</code> is just one example.<br><br><b>The fix:</b> change <code>hourz</code> to <code>hours</code>, save, and run <code>python3 build.py</code> again.'],
+  t1: ['The route: you can skip this', 'These lines show the route the program took to reach the problem. They look alarming, but you rarely need them. Read the <b>last line</b> first.'],
+  t2: ['Read this line first', '<code>JSONDecodeError</code> means a JSON file has a mistake. <code>line 12 column 5</code> tells you where: go to line 12 of the JSON file you just edited. If line 12 looks fine, check the end of line 11. A missing comma is reported on the line after it.']
+};
+function dcSelect(k){
+  $$('#v-check .hot').forEach(h => h.classList.toggle('sel', h.dataset.x === k));
+  const d = DC[k];
+  $('#dcExplain').innerHTML = '<span class="label">' + d[0] + '</span><p>' + d[1] + '</p>';
+}
+$$('#v-check .hot').forEach(h => {
+  h.addEventListener('click', () => dcSelect(h.dataset.x));
+  h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); dcSelect(h.dataset.x); } });
+});
+tabGroup('#dcTabs', 'dc', 'dcp', k => dcSelect({ ok:'ok1', fail:'f1', tb:'t2' }[k]));
+dcSelect('f1');
+
+const TS = [
+  { q:'Did you run the build after editing?', no:'Run <code>python3 build.py</code> in the terminal, then reload the page.' },
+  { q:'Did you open the page from <code>public/</code>? Not an old copy, and not <code>_preview/</code>.', no:'Open <code>public/index.html</code> from the project folder in Finder. Old copies and <code>_preview/</code> won\'t show your change.' },
+  { q:'Did you force a full reload? Chrome: <kbd>Cmd</kbd> <kbd>Shift</kbd> <kbd>R</kbd>. Safari: <kbd>Cmd</kbd> <kbd>Option</kbd> <kbd>R</kbd>.', no:'Do the force reload now. The browser may be showing its saved copy (the cache).' }
+];
+let tsStep = 0, tsFix = null;
+function tsRender(){
+  const box = $('#tsBox');
+  const bar = '<div class="ts-steps">' + TS.map((s, i) => '<span class="' + (i <= tsStep ? 'on' : '') + '"></span>').join('') + '</div>';
+  if (tsFix !== null){
+    box.innerHTML = bar + '<div class="say warn" style="margin-top:0"><span class="label">Do this</span>' + TS[tsFix].no + '</div><div class="row" style="margin-top:12px"><button class="btn primary" type="button" data-ts="again">Done. Check again</button><button class="btn ghost" type="button" data-ts="restart">Start over</button></div>';
+  } else if (tsStep >= TS.length){
+    box.innerHTML = bar + '<div class="say" style="margin-top:0"><span class="label">Still not showing?</span>Ask for help, and say which file you edited, which page you opened, and what the build printed.</div><div class="row" style="margin-top:12px"><button class="btn ghost" type="button" data-ts="restart">Start over</button></div>';
+  } else {
+    box.innerHTML = bar + '<p class="ts-q">' + TS[tsStep].q + '</p><div class="row"><button class="btn primary" type="button" data-ts="yes">Yes</button><button class="btn" type="button" data-ts="no">No</button></div>';
+  }
+}
+$('#tsBox').addEventListener('click', e => {
+  const b = e.target.closest('[data-ts]'); if (!b) return;
+  const a = b.dataset.ts;
+  if (a === 'yes') tsStep++;
+  if (a === 'no') tsFix = tsStep;
+  if (a === 'again') tsFix = null;
+  if (a === 'restart'){ tsStep = 0; tsFix = null; }
+  tsRender();
+});
+tsRender();
+
+/* =========================================================
+   Lesson 5: Git playground
+   ========================================================= */
+const ARTICLES = ['wine-auctions.md', 'decanting.md', 'champagne-storage.md', 'reading-labels.md', 'vintage-years.md', 'cellar-humidity.md'];
+const GSTEPS = [
+  ['branch', 'Create a branch called practice'],
+  ['edit', 'Write an article on practice'],
+  ['commit', 'Commit it'],
+  ['push', 'Push practice to GitHub'],
+  ['switch', 'Switch to main: the article disappears'],
+  ['merge', 'Merge the pull request on GitHub'],
+  ['pull', 'Pull main: the article comes back'],
+  ['delete', 'Delete the practice branch']
+];
+let G;
+function gReset(){
+  G = {
+    commits:{
+      a1:{ msg:'Build the bilingual site', adds:['storage-basics.md'], kind:'main' },
+      a2:{ msg:'Add guide articles (pull request #1)', adds:['cork-care.md', 'serving-temperature.md'], kind:'main' }
+    },
+    local:{ main:['a1', 'a2'] }, remote:{ main:['a1', 'a2'] },
+    head:'main', working:[], n:0, art:0, prNum:2, merged:[], gone:[], fresh:[], steps:new Set(),
+    msg:'Your Mac and GitHub have the same <b>main</b> branch. Follow the numbered steps, or click anything.', tone:'info'
+  };
+  gRender();
+}
+const gFiles = list => { const s = []; list.forEach(id => G.commits[id].adds.forEach(f => { if (!s.includes(f)) s.push(f); })); return s; };
+function gAB(b){ const L = G.local[b] || [], R = G.remote[b]; if (!R) return null; return { ahead:L.filter(x => !R.includes(x)).length, behind:R.filter(x => !L.includes(x)).length }; }
+const plural = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+function gMsg(m, tone){ G.msg = m; G.tone = tone || 'info'; }
+function gStep(k){ G.steps.add(k); }
+const G_ACT = {
+  edit(){
+    const f = ARTICLES[G.art % ARTICLES.length]; G.art++; G.working.push(f); G.fresh = [f];
+    gMsg('You wrote a new article, <code>' + f + '</code>. Git sees a new file but hasn\'t saved it. Commit to take a snapshot.', 'info');
+    if (G.head === 'practice') gStep('edit');
+  },
+  commit(){
+    if (!G.working.length) return gMsg('Nothing to commit. Write an article first.', 'warn');
+    const id = 'c' + (++G.n);
+    G.commits[id] = { msg:'Add ' + G.working.join(', '), adds:G.working.slice(), kind:G.head === 'main' ? 'main' : 'practice' };
+    G.local[G.head].push(id); G.working = [];
+    gMsg('Saved a snapshot on your Mac, on branch <b>' + G.head + '</b>. It stays on your Mac until you push.', 'ok');
+    if (G.head === 'practice') gStep('commit');
+  },
+  push(){
+    const b = G.head, L = G.local[b], R = G.remote[b];
+    if (!R){
+      G.remote[b] = L.slice();
+      gMsg('Created <b>' + b + '</b> on GitHub and sent your commits. ' + (b === 'practice' ? 'GitHub now offers a pull request to merge it into main.' : ''), 'ok');
+      if (b === 'practice') gStep('push');
+      return;
+    }
+    const ab = gAB(b);
+    if (!ab.ahead) return gMsg('Nothing to push. GitHub already has all your commits on <b>' + b + '</b>.', 'info');
+    if (ab.behind) return gMsg('GitHub refused the push: it has commits your Mac doesn\'t have yet. Pull first, then push.', 'warn');
+    G.remote[b] = L.slice();
+    gMsg('Sent ' + plural(ab.ahead, 'commit') + ' to GitHub. Your work is backed up. The live site has not changed.', 'ok');
+    if (b === 'practice') gStep('push');
+  },
+  pull(){
+    const b = G.head, L = G.local[b], R = G.remote[b];
+    if (!R) return gMsg('<b>' + b + '</b> isn\'t on GitHub yet, so there\'s nothing to pull. Push it first.', 'info');
+    const ab = gAB(b);
+    if (!ab.behind) return gMsg('Already up to date. GitHub has nothing new on <b>' + b + '</b>.', 'info');
+    const before = gFiles(L);
+    if (!ab.ahead){ G.local[b] = R.slice(); gMsg('Fast-forward: your Mac\'s <b>' + b + '</b> caught up with GitHub (' + plural(ab.behind, 'new commit') + ').', 'ok'); }
+    else { const mine = L.filter(x => !R.includes(x)); G.local[b] = R.concat(mine); gMsg('Pulled. Git combined GitHub\'s new commits with yours. They changed different files, so there was no conflict. Push to send yours.', 'ok'); }
+    const added = gFiles(G.local[b]).filter(f => !before.includes(f));
+    G.fresh = added;
+    if (added.length) G.msg += ' New in your folder: <code>' + added.join('</code>, <code>') + '</code>.';
+    if (b === 'main' && G.merged.length && added.length) gStep('pull');
+  },
+  branch(){
+    if (G.local.practice) return gMsg('The branch <b>practice</b> already exists. Use the switch button.', 'info');
+    G.local.practice = G.local[G.head].slice(); G.head = 'practice';
+    gMsg('Created <b>practice</b> and switched to it. Your folder looks exactly the same, because practice starts as a copy of main.', 'ok');
+    gStep('branch');
+  },
+  switchTo(b){
+    if (G.working.length) return gMsg('You have an uncommitted change (<code>' + G.working[0] + '</code>). Commit it first. Switching branch with uncommitted changes is on the "be careful" list.', 'warn');
+    const before = gFiles(G.local[G.head]); G.head = b; const after = gFiles(G.local[b]);
+    const gone = before.filter(f => !after.includes(f)), came = after.filter(f => !before.includes(f));
+    G.gone = gone; G.fresh = came;
+    let m = 'Switched to <b>' + b + '</b>. Your folder now shows ' + b + '\'s files.';
+    if (gone.length){
+      m += ' <code>' + gone.join('</code>, <code>') + '</code> disappeared from the folder because ' + (gone.length > 1 ? 'they exist' : 'it exists') + ' only on the other branch. Nothing is lost: switch back and ' + (gone.length > 1 ? 'they return.' : 'it returns.');
+      if (b === 'main') gStep('switch');
+    }
+    if (came.length) m += ' <code>' + came.join('</code>, <code>') + '</code> appeared.';
+    gMsg(m, gone.length ? 'warn' : 'ok');
+  },
+  merge(){
+    const Pr = G.remote.practice, M = G.remote.main;
+    if (!Pr) return;
+    const extra = Pr.filter(x => !M.includes(x));
+    if (!extra.length) return gMsg('Nothing to merge. main on GitHub already has all of practice\'s work.', 'info');
+    const ff = M.every(x => Pr.includes(x));
+    G.remote.main = ff ? Pr.slice() : M.concat(extra);
+    G.merged.push(G.prNum);
+    gMsg('Merged pull request #' + G.prNum + ' on GitHub' + (ff ? ' as a fast-forward: main just moved forward' : '') + '. <b>main on GitHub</b> now has practice\'s work. Your Mac\'s main doesn\'t yet: it\'s behind. ' + (G.head === 'main' ? 'Pull to get it.' : 'Switch to main and pull.'), 'ok');
+    G.prNum++;
+    gStep('merge');
+  },
+  ghedit(){
+    const id = 'g' + (++G.n);
+    G.commits[id] = { msg:'Fix a typo (edited on github.com)', adds:[], kind:'gh' };
+    G.remote.main.push(id);
+    gMsg('Someone changed main directly on GitHub (or you did, from another computer). Your Mac\'s main is now <b>behind 1</b>. Switch to main if needed, then pull.', 'info');
+  },
+  delete(){
+    if (!G.local.practice) return;
+    if (G.head === 'practice') return gMsg('Switch to main first. You can\'t delete the branch your folder is showing.', 'warn');
+    const unmerged = G.local.practice.filter(x => !G.local.main.includes(x) && !G.remote.main.includes(x));
+    if (unmerged.length) return gMsg('Stopped. practice has work that isn\'t in main yet, so deleting it could lose that work. Merge it first. (Deleting an unmerged branch is on the "ask first" list.)', 'bad');
+    delete G.local.practice; delete G.remote.practice;
+    gMsg('Deleted practice on your Mac and on GitHub. That was safe because all its work is already in main.', 'ok');
+    gStep('delete');
+  }
+};
+function gLanes(where){
+  const brs = where === 'local' ? G.local : G.remote;
+  return Object.keys(brs).map(b => {
+    const dots = brs[b].map((id, i) => (i ? '<span class="seg"></span>' : '') + '<span class="dot k-' + G.commits[id].kind + '" title="' + esc(G.commits[id].msg) + '"></span>').join('');
+    const head = where === 'local' && b === G.head;
+    let tag = '';
+    if (where === 'local'){ const ab = gAB(b); tag = !ab ? '<span class="pill">not on GitHub</span>' : (ab.ahead ? '<span class="pill gh">ahead ' + ab.ahead + '</span>' : '') + (ab.behind ? '<span class="pill warn">behind ' + ab.behind + '</span>' : ''); }
+    return '<div class="lane"><span class="lane-name">' + (head ? '▸ ' : '') + b + '</span><span class="dots">' + dots + '</span>' + tag + '</div>';
+  }).join('');
+}
+function gRender(){
+  const ab = gAB(G.head);
+  let st = 'On branch ' + G.head + '\n';
+  if (!ab) st += 'This branch is only on your Mac (not pushed yet).\n';
+  else if (ab.ahead && ab.behind) st += 'Your branch and \'origin/' + G.head + '\' have diverged:\n' + ab.ahead + ' and ' + ab.behind + ' different commits each.\n';
+  else if (ab.ahead) st += 'Your branch is ahead of \'origin/' + G.head + '\' by ' + plural(ab.ahead, 'commit') + '.\n';
+  else if (ab.behind) st += 'Your branch is behind \'origin/' + G.head + '\' by ' + plural(ab.behind, 'commit') + '.\n';
+  else st += 'Your branch is up to date with \'origin/' + G.head + '\'.\n';
+  st += G.working.length ? '\nUntracked files:\n' + G.working.map(f => '  content/guides/zh-hk/' + f).join('\n') : '\nnothing to commit, working tree clean';
+  $('#gStatus').textContent = st;
+  $('#gHeadPill').textContent = 'folder shows: ' + G.head;
+  $('#gLocal').innerHTML = gLanes('local');
+  $('#gRemote').innerHTML = gLanes('remote');
+  const files = gFiles(G.local[G.head]);
+  $('#gFolder').innerHTML = '<div class="fh">content/guides/zh-hk/ in your folder</div><ul>' +
+    files.map(f => '<li' + (G.fresh.includes(f) ? ' class="new"' : '') + '>' + esc(f) + (G.fresh.includes(f) ? ' <span class="pill ok">new here</span>' : '') + '</li>').join('') +
+    G.working.map(f => '<li class="new">' + esc(f) + ' <span class="pill warn">not committed</span></li>').join('') +
+    G.gone.map(f => '<li class="gone">' + esc(f) + '</li>').join('') + '</ul>';
+  const Pr = G.remote.practice;
+  const extra = Pr ? Pr.filter(x => !G.remote.main.includes(x)) : [];
+  let pr = '';
+  if (Pr && extra.length) pr = '<div><span class="pill gh">open</span> <b>Pull request #' + G.prNum + ': practice → main</b></div><div class="small muted">Files changed: ' + gFiles(extra).map(f => '<code>+ ' + esc(f) + '</code>').join(' ') + '</div><div><button class="btn gh sm" type="button" data-g="merge">Merge pull request</button></div>';
+  else if (G.merged.length) pr = '<div><span class="pill ok">merged</span> <b>Pull request #' + G.merged[G.merged.length - 1] + '</b></div><div class="small muted">Its work is now in main on GitHub.</div>';
+  else pr = '<div class="small muted">No open pull requests. Push a branch with new commits to open one.</div>';
+  $('#gPR').innerHTML = pr;
+  $('#gSwitchBtns').innerHTML = Object.keys(G.local).filter(b => b !== G.head).map(b => '<button class="btn mac" type="button" data-g="switch" data-b="' + b + '">Switch to ' + b + '</button>').join('');
+  $('#gDelete').hidden = !G.local.practice;
+  $('[data-g="branch"]').hidden = !!G.local.practice;
+  let nextFound = false;
+  $('#gMission').innerHTML = GSTEPS.map(s => {
+    const d = G.steps.has(s[0]); let cls = d ? 'done' : '';
+    if (!d && !nextFound){ cls = 'next'; nextFound = true; }
+    return '<li class="' + cls + '">' + s[1] + '</li>';
+  }).join('');
+  say($('#gSay'), G.msg, G.tone, 'What just happened');
+}
+$('#gitLab').addEventListener('click', e => {
+  const b = e.target.closest('[data-g]'); if (!b) return;
+  const a = b.dataset.g;
+  if (a === 'reset') return gReset();
+  G.gone = []; G.fresh = [];
+  if (a === 'switch') G_ACT.switchTo(b.dataset.b); else G_ACT[a]();
+  gRender();
+  if (G.steps.size === GSTEPS.length && !G.celebrated){ G.celebrated = true; G.msg += '<br><br><b>All 8 steps done.</b> That\'s the same cycle you used for the 20 guide articles: branch, commit, push, pull request, merge, pull.'; gRender(); }
+});
+gReset();
+
+/* commit message checker */
+const PAST = { updated:'Update', added:'Add', fixed:'Fix', changed:'Change', removed:'Remove', deleted:'Delete', created:'Create', edited:'Edit', moved:'Move', renamed:'Rename' };
+const VAGUE = ['update','updates','fix','fixes','fixed','changes','change','changed','edit','edits','stuff','wip','misc','test','save','final','done','new','updated'];
+function cmCheck(){
+  const t = $('#cmInput').value.trim(), el = $('#cmSay');
+  if (!t) return say(el, 'Type a message to check it.', 'info');
+  const words = t.split(/\s+/);
+  if (words.length <= 2 && words.every(w => VAGUE.includes(w.toLowerCase().replace(/[^a-z]/g, ''))))
+    return say(el, 'Someone reading the history can\'t tell what changed. Say what and where, e.g. <code>Update phone number in site.json</code>.', 'bad', 'Too vague');
+  if (t.length > 72) return say(el, t.length + ' characters is long for one line. Keep the message short, about 50 to 72 characters.', 'warn', 'Too long');
+  const first = words[0].toLowerCase();
+  if (PAST[first]) return say(el, 'Clear, but the convention is a short command. Try: <code>' + esc(PAST[first] + ' ' + words.slice(1).join(' ')) + '</code>' + (words.length < 4 ? '. It could also say where, e.g. which file.' : ''), 'warn', 'Nearly there');
+  if (words.length < 3) return say(el, 'A bit short. Add what changed and where, e.g. <code>Fix typo in footer hours</code>.', 'warn', 'Add detail');
+  say(el, 'It says what changed, as a short command. If the reason isn\'t obvious, add why.', 'ok', 'Good message');
+}
+$('#cmInput').addEventListener('input', cmCheck);
+$$('[data-cm]').forEach(b => b.addEventListener('click', () => { $('#cmInput').value = b.dataset.cm; cmCheck(); }));
+cmCheck();
+
+/* =========================================================
+   Lesson 6: journey of one change
+   ========================================================= */
+const J = [
+  { tag:'Edit', place:'mac', title:'Edit data/site.json', body:'Open <code>data/site.json</code> in VS Code. Change the value of <code>"whatsapp"</code> to the new number, keep the straight double quotes, and save. Phone and WhatsApp are written once here and used by every language.', code:'"whatsapp": "+852 …new number…",', s:[1,0,0,0] },
+  { tag:'Build', place:'mac', title:'Run the build', body:'In the VS Code terminal, run the build. Look for a list of <code>built …</code> lines and no "build failed". Both languages update, because <code>site.json</code> is shared.', code:'python3 build.py', s:[1,1,0,0] },
+  { tag:'Check', place:'mac', title:'Check in your browser', body:'Double-click <code>public/index.html</code> in Finder and open a page that shows the WhatsApp number, in Chinese and in English. Not seeing it? Force a reload with <kbd>Cmd</kbd> <kbd>Shift</kbd> <kbd>R</kbd>.', code:'', s:[1,1,0,0] },
+  { tag:'Commit', place:'mac', title:'Commit source and built pages together', body:'In VS Code Source Control you\'ll see <code>data/site.json</code> plus the rebuilt pages in <code>public/</code>. Commit them all together with a clear message. The snapshot is on your Mac only: <code>ahead 1</code>.', code:'Update WhatsApp number in site.json', s:[1,1,0,0] },
+  { tag:'Push', place:'gh', title:'Push to GitHub', body:'Click <b>Sync Changes</b> (or run <code>git push</code>). The change is now backed up on GitHub. Visitors still see the old number.', code:'git push', s:[1,1,1,0] },
+  { tag:'Upload', place:'live', title:'Upload public/ to the web host', body:'Upload the <b>contents</b> of <code>public/</code> to the host. Never upload <code>_preview/</code>, <code>_source/</code>, <code>content/</code>, <code>templates/</code>, <code>partials/</code> or <code>data/</code>. Visitors now see the new number.', code:'', s:[1,1,1,1] }
+];
+const J_STATE = [['data/site.json', 'Your Mac'], ['public/ pages', 'Your Mac'], ['GitHub', 'Backup'], ['Live site', 'Visitors see']];
+let jIdx = 0;
+function jRender(){
+  const st = J[jIdx];
+  $('#jSteps').innerHTML = J.map((s, i) => '<button class="jstep' + (i === jIdx ? ' on' : i < jIdx ? ' past' : '') + '" type="button" data-j="' + i + '">' + (i + 1) + ' ' + s.tag + '</button>').join('');
+  const placeName = { mac:'On your Mac', gh:'Mac → GitHub', live:'Mac → web host' }[st.place];
+  $('#jCard').innerHTML = '<div class="jcard"><span class="pill ' + st.place + '">' + placeName + '</span><h4 style="margin-top:10px">' + (jIdx + 1) + '. ' + st.title + '</h4><p>' + st.body + '</p>' + (st.code ? '<pre class="code" style="margin:8px 0 0">' + esc(st.code) + '</pre>' : '') + '</div>';
+  $('#jState').innerHTML = J_STATE.map((k, i) => '<div class="js' + (st.s[i] ? ' new' : '') + '"><span class="k">' + k[0] + '</span><span class="v">' + (st.s[i] ? 'New number' : 'Old number') + '</span></div>').join('');
+  $('#jBack').disabled = jIdx === 0;
+  $('#jNext').textContent = jIdx === J.length - 1 ? 'Start again' : 'Next step →';
+}
+$('#jSteps').addEventListener('click', e => { const b = e.target.closest('[data-j]'); if (b){ jIdx = +b.dataset.j; jRender(); } });
+$('#jBack').addEventListener('click', () => { if (jIdx > 0){ jIdx--; jRender(); } });
+$('#jNext').addEventListener('click', () => { jIdx = jIdx === J.length - 1 ? 0 : jIdx + 1; jRender(); });
+jRender();
+
+/* =========================================================
+   Lesson 7: help request builder
+   ========================================================= */
+function hbText(){
+  const goal = $('#hbGoal').value.trim();
+  const limits = $$('#hbLimits input:checked').map(i => i.value);
+  const unclear = $('#hbUnclear').value.trim();
+  const level = ($('#hbLevel input:checked') || {}).value;
+  const end = $$('#hbEnd input:checked').map(i => i.value);
+  const out = [];
+  if (goal) out.push('Goal: ' + goal);
+  if (limits.length) out.push('Limits: ' + limits.join(' '));
+  if (unclear) out.push('What I don\'t understand: ' + unclear);
+  if (level) out.push(level);
+  end.forEach(x => out.push(x));
+  return out.join('\n');
+}
+function hbRender(){ $('#hbOut').textContent = hbText() || 'Fill in the fields above.'; }
+['#hbGoal', '#hbUnclear'].forEach(s => $(s).addEventListener('input', hbRender));
+$$('#hbLimits input, #hbLevel input, #hbEnd input').forEach(i => i.addEventListener('change', hbRender));
+$('#hbCopy').addEventListener('click', e => {
+  const btn = e.currentTarget, old = btn.textContent, text = hbText();
+  const fail = () => { const r = document.createRange(); r.selectNodeContents($('#hbOut')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Text selected: press Cmd + C'; setTimeout(() => { btn.textContent = old; }, 2200); };
+  try { navigator.clipboard.writeText(text).then(() => { btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = old; }, 1400); }, fail); } catch(err){ fail(); }
+});
+hbRender();
+
+/* =========================================================
+   Tool: finder + folder map
+   ========================================================= */
+const FIND = [
+  ['Any Chinese wording on a page', ['content/zh-hk.json'], 'Search the file for the current text to find the key.', 'chinese text words wording copy 中文'],
+  ['Any English wording', ['content/en.json'], 'Same keys as the Chinese file.', 'english text words wording copy'],
+  ['Copyright line in the footer', ['content/zh-hk.json', 'content/en.json'], 'Under <code>footer</code> → <code>copy</code>, in both language files. Then run the build.', 'copyright footer ©'],
+  ['Prices', ['data/plans.json'], 'The calculator, price table and plan finder all follow it.', 'price cost plan calculator table fee'],
+  ['Phone, WhatsApp, social links, website address, Google Analytics', ['data/site.json'], 'Written once, used by every language.', 'phone whatsapp instagram facebook social url domain analytics'],
+  ['English address (and the address Google reads)', ['data/site.json'], 'Under <code>address</code>.', 'address english google map'],
+  ['Chinese address, opening hours', ['content/zh-hk.json'], 'Under <code>visit.addr</code>, <code>contact.days</code> and <code>contact.hours</code>.', 'address hours opening time days chinese'],
+  ['Menu names', ['content/zh-hk.json', 'content/en.json'], 'Under <code>nav</code>, in both language files.', 'menu nav navigation names'],
+  ['Header / menu layout', ['partials/_header.html'], 'The layout of the header on every page.', 'header menu layout top'],
+  ['Footer layout and links', ['partials/_footer.html'], 'Footer wording is in <code>content/*.json</code> → <code>footer</code>.', 'footer bottom links layout'],
+  ['Layout of one page', ['templates/<page>.html'], 'For example <code>templates/club.html</code>.', 'layout page template'],
+  ['Text of a guide article', ['content/guides/zh-hk/<slug>.md'], '<code>&lt;slug&gt;</code> is the article\'s short English name.', 'article guide text markdown 酒窖手記 blog'],
+  ['A guide\'s title, summary, photo, buttons, status', ['data/guides.json'], 'Set <code>status: "live"</code> with <code>published</code> and <code>updated</code> dates to publish an article.', 'guide title summary photo status live ready buttons'],
+  ['Closing line on the guides hub', ['data/guides.json'], 'Under <code>section.cta_line</code>.', 'guides hub closing line cta'],
+  ['Colours, fonts, spacing', ['public/assets/css/site.css'], 'Ask for help first: one change affects every page.', 'colour color font spacing style css design'],
+  ['Replace a photo', ['public/assets/img/'], 'Put the new photo in with the <b>same name</b>. Keep the original in <code>_source/photos/</code>.', 'photo image picture img jpg']
+];
+const TREE = [
+  { p:'content/', t:'source', d:'All wording, plus article text. Not uploaded.', c:[
+    { p:'content/zh-hk.json', n:'zh-hk.json', t:'source', d:'All Chinese wording, plus the Chinese address and opening hours.' },
+    { p:'content/en.json', n:'en.json', t:'source', d:'All English wording. Same keys as zh-hk.json.' },
+    { p:'content/guides/zh-hk/<slug>.md', n:'guides/zh-hk/<slug>.md', t:'source', d:'The text of each guide article, in Markdown.' } ] },
+  { p:'data/', t:'source', d:'Facts, prices and the guide list. Not uploaded.', c:[
+    { p:'data/site.json', n:'site.json', t:'source', d:'Phone, WhatsApp, social links, website address, Google Analytics and the English address. Used by every language.' },
+    { p:'data/plans.json', n:'plans.json', t:'source', d:'Prices. The calculator, price table and plan finder all follow it.' },
+    { p:'data/guides.json', n:'guides.json', t:'source', d:'Each guide\'s title, summary, photo, buttons and status, plus the guides hub closing line.' } ] },
+  { p:'templates/', t:'source', d:'Page layouts with {{ }} fields. Not uploaded.', c:[
+    { p:'templates/<page>.html', n:'<page>.html', t:'source', d:'The layout of one page, e.g. templates/club.html or templates/app.html.' } ] },
+  { p:'partials/', t:'source', d:'Shared pieces used on every page (head, header, footer…). Not uploaded.', c:[
+    { p:'partials/_header.html', n:'_header.html', t:'source', d:'Header and menu layout.' },
+    { p:'partials/_footer.html', n:'_footer.html', t:'source', d:'Footer layout and links. The build copies it into every page.' } ] },
+  { p:'public/', t:'upload', d:'The website itself: built pages, plus CSS, JavaScript and images. Upload its contents to the web host.', c:[
+    { p:'public/zh-hk/', n:'zh-hk/', t:'built', d:'Built Chinese pages. Never edit: the next build replaces them.' },
+    { p:'public/en/', n:'en/', t:'built', d:'Built English pages. Never edit: the next build replaces them.' },
+    { p:'public/index.html', n:'index.html', t:'built', d:'Built. Never edit. Double-click it in Finder to check the site in your browser.' },
+    { p:'public/assets/css/site.css', n:'assets/css/site.css', t:'ask', d:'Colours, fonts and spacing for every page. Ask for help first.' },
+    { p:'public/assets/js/', n:'assets/js/', t:'plain', d:'JavaScript: menus that open, the storage calculator.' },
+    { p:'public/assets/img/', n:'assets/img/', t:'plain', d:'Photos. To replace one, use the same file name. Keep originals in _source/photos/.' } ] },
+  { p:'_preview/', t:'built', d:'A review copy that includes unfinished (ready) articles. Built. Never edit, and never upload.' },
+  { p:'_source/', t:'plain', d:'Original photos and design references. Not uploaded.', c:[
+    { p:'_source/photos/', n:'photos/', t:'plain', d:'Keep the original of every photo here.' } ] },
+  { p:'build.py', t:'plain', d:'The build script. It turns source files into finished pages in public/.' },
+  { p:'README.md', t:'plain', d:'Explains the project in detail, including the launch to-do list. Worth reading once.' }
+];
+const BADGE = { source:'<span class="pill accent">Edit here</span>', built:'<span class="pill bad">Built: never edit</span>', upload:'<span class="pill live">Upload its contents</span>', ask:'<span class="pill warn">Ask first</span>', plain:'' };
+const treeIndex = {};
+function treeHTML(nodes){
+  return '<ul>' + nodes.map(n => { treeIndex[n.p] = n; return '<li><button class="node" type="button" data-path="' + esc(n.p) + '"><span class="nm">' + esc(n.n || n.p) + '</span>' + BADGE[n.t] + '</button>' + (n.c ? treeHTML(n.c) : '') + '</li>'; }).join('') + '</ul>';
+}
+$('#tree').innerHTML = treeHTML(TREE);
+function treeShow(path){
+  const n = treeIndex[path]; if (!n) return;
+  $('#treeInfo').innerHTML = '<span class="label">Selected</span><div class="path">' + esc(n.p) + '</div><div style="margin-top:8px">' + (BADGE[n.t] || '') + '</div><p>' + esc(n.d) + '</p>';
+}
+function highlight(paths){ $$('#tree .node').forEach(b => b.classList.toggle('hl', paths.includes(b.dataset.path))); }
+$('#tree').addEventListener('click', e => { const b = e.target.closest('.node'); if (!b) return; highlight([b.dataset.path]); treeShow(b.dataset.path); });
+let fdSel = 3;
+function fdRender(){
+  const q = $('#fdSearch').value.trim().toLowerCase();
+  const rows = FIND.map((r, i) => ({ r:r, i:i })).filter(x => !q || (x.r[0] + ' ' + x.r[1].join(' ') + ' ' + x.r[3]).toLowerCase().includes(q));
+  $('#fdList').innerHTML = rows.length ? rows.map(x => '<button class="find-row' + (x.i === fdSel ? ' on' : '') + '" type="button" data-i="' + x.i + '"><span>' + esc(x.r[0]) + '</span><code>' + esc(x.r[1].join(' + ')) + '</code></button>').join('') : '<p class="muted small" style="margin:6px 2px">No match. Try another word, or ask "where do I edit this?"</p>';
+}
+function fdPick(i){
+  fdSel = i; const r = FIND[i];
+  $('#fdAnswer').innerHTML = '<span class="label">Edit this</span><div class="path">' + r[1].map(esc).join('<br>') + '</div><p>' + r[2] + ' Then run <code>python3 build.py</code>.</p>';
+  highlight(r[1]); treeShow(r[1][0]); fdRender();
+}
+$('#fdSearch').addEventListener('input', fdRender);
+$('#fdList').addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) fdPick(+b.dataset.i); });
+fdPick(fdSel);
+
+/* =========================================================
+   Tool: glossary
+   ========================================================= */
+const GLOSS = [
+  ['Static website', '靜態網站', 'Pages are ready-made files; nothing is assembled when a visitor arrives'],
+  ['Source file', '原始檔', 'A file you edit (templates, content, data)'],
+  ['Built / generated file', '建置檔 / 自動生成檔', 'A file the build creates (public/…); never edit it'],
+  ['Build', '建置', 'Turning source files into finished pages (python3 build.py)'],
+  ['Template', '範本', 'A page layout with {{ }} fields'],
+  ['Partial', '共用片段', 'A shared piece (header, footer) used on every page'],
+  ['Placeholder', '佔位符', 'A {{key}} field the build fills in'],
+  ['JSON', 'JSON 資料格式', 'The text format for wording and data (.json)'],
+  ['Markdown', 'Markdown 格式', 'The simple text format for articles (.md)'],
+  ['Host / hosting', '網站寄存', 'The service that serves your site to visitors'],
+  ['Domain', '網域', 'The address, e.g. sensecellar.com'],
+  ['Deploy / publish', '部署 / 發佈', 'Putting the built site on the host'],
+  ['Cache', '快取', 'The browser\'s saved copy; force-reload to see changes'],
+  ['Terminal', '終端機', 'The window where you type commands'],
+  ['Repository (repo)', '儲存庫', 'The project plus its full history'],
+  ['Commit', '提交', 'A saved snapshot with a message'],
+  ['Push / Pull', '推送 / 拉取', 'Send to / fetch from GitHub'],
+  ['Branch', '分支', 'A separate line of work'],
+  ['Merge', '合併', 'Bring one branch\'s work into another'],
+  ['Pull request (PR)', '合併請求', 'A GitHub page proposing a merge, for review'],
+  ['Remote / Local', '遠端 / 本機', 'GitHub\'s copy / your Mac\'s copy'],
+  ['Untracked', '未追蹤', 'A file Git doesn\'t know about'],
+  ['Conflict', '衝突', 'Two changes to the same lines that Git can\'t combine alone'],
+  ['SEO', '搜尋引擎優化', 'Making pages easy for Google to find and understand'],
+  ['Structured data', '結構化資料', 'Hidden info for Google (address, phone, article dates)']
+];
+function glRender(){
+  const q = $('#glSearch').value.trim().toLowerCase();
+  const rows = GLOSS.filter(r => !q || r.join(' ').toLowerCase().includes(q));
+  $('#glBody').innerHTML = rows.map(r => '<tr><td><b>' + esc(r[0]) + '</b></td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>').join('') || '<tr><td colspan="3" class="muted">No matching term.</td></tr>';
+  $('#glCount').textContent = rows.length + ' of ' + GLOSS.length + ' terms';
+}
+$('#glSearch').addEventListener('input', glRender);
+glRender();
+
+/* =========================================================
+   Tool: quiz
+   ========================================================= */
+const QUIZ = [
+  ['You want to change the copyright line in the footer. Which file do you edit?', '<code>content/zh-hk.json</code> → <code>footer.copy</code> (and <code>content/en.json</code> for English). Then run <code>python3 build.py</code>.'],
+  ['Why does every file in <code>public/</code> contain the whole footer?', 'The host can only send complete pages, so the build copies the footer from <code>partials/_footer.html</code> into every page. You edit the partial once and rebuild.'],
+  ['You pushed to GitHub. Did the live website change?', 'No. GitHub and the host are separate. The site only changes when you upload <code>public/</code>.'],
+  ['What is the difference between a commit and a push?', 'A commit saves a snapshot <i>on your Mac</i>. A push sends your commits <i>to GitHub</i>.'],
+  ['The build says: <code>{{nav.contct}} is not filled in (partials/_header.html)</code>. What do you do?', 'Open <code>partials/_header.html</code>, find <code>{{nav.contct}}</code>, fix the typo to match the key in <code>content/*.json</code>, and build again. <code>public/</code> was not changed, so nothing broken went out.'],
+  ['You see a file called <code>faq 2.html</code>. What is it, and what do you do?', 'Probably an iCloud duplicate. <code>git status</code> lists it as untracked. If it is identical to <code>faq.html</code>, delete it. If it is different, ask before deleting.'],
+  ['The shop\'s WhatsApp number changes. Which file(s)?', 'Only <code>data/site.json</code> → <code>"whatsapp"</code>, written like <code>"+852 9108 9724"</code>. Both languages update when you rebuild.'],
+  ['<code>git status</code> says "Your branch is ahead of \'origin/main\' by 2 commits." What does it mean, and what do you do?', 'You have 2 commits on your Mac that GitHub doesn\'t have yet. Run <code>git push</code> (or <b>Sync Changes</b> in VS Code).'],
+  ['You switch branch and some files disappear. Did you lose work?', 'No. Your folder now shows the other branch\'s version. Switch back and the files return, as long as they were committed.'],
+  ['When is it safe to delete a branch?', 'When all its work has been merged into main, for example after its pull request is merged.'],
+  ['A new guide article is approved. How does it get to the live site?', 'Text in <code>content/guides/zh-hk/&lt;slug&gt;.md</code>; in <code>data/guides.json</code> set <code>status: "live"</code> with <code>published</code> and <code>updated</code> dates; run <code>python3 build.py</code>; check; commit and push; upload <code>public/</code> to the host.'],
+  ['Why must <code>_preview/</code> never be uploaded?', 'It includes unfinished (<code>ready</code>) articles marked "noindex", for internal review only.']
+];
+$('#quizList').innerHTML = QUIZ.map((q, i) => '<details class="q"><summary><span class="qn">' + String(i + 1).padStart(2, '0') + '</span><span>' + q[0] + '</span><span class="rv">Answer</span></summary><div class="a">' + q[1] + '</div></details>').join('');
+
+/* =========================================================
+   Boot
+   ========================================================= */
+renderProgress();
+const startView = names.includes(location.hash.slice(1)) ? location.hash.slice(1) : store.get('view', 'start');
+show(startView, false);
+})();
+</script>
+
+</body></html>
